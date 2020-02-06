@@ -1,0 +1,14 @@
+﻿
+@model IEnumerable<addBookApp.Models.Book>
+
+<h2>Список книг</h2>
+
+<div>
+    @foreach (var b in Model)
+    {
+        <tr>
+            <td>@b.Name</td>
+            <td>@b.Author</td>
+        </tr>
+    }
+</div>
