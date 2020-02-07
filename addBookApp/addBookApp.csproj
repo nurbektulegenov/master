@@ -176,6 +176,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\ViewBooks\View.cshtml" />
     <Content Include="Views\Shared\BooksPartialView.cshtml" />
+    <Content Include="Views\ViewBooks\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

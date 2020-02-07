@@ -4,18 +4,20 @@
 <h2>Список книг</h2>
 
 <div>
-    <tr>
-        <td><p>Название книги</p></td>
-        <td><p>Автор</p></td>
-        <td></td>
-    </tr>
-    @foreach (var b in Model)
-    {
     <table>
         <tr>
-            <td><p>@b.Name</p></td>
-            <td><p>@b.Author</p></td>
+            <td><h5>Название книги</h5></td>
+            <td><h5>Автор</h5></td>
+            <td></td>
         </tr>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td><p>@b.Name</p></td>
+                <td><p>@b.Author</p></td>
+                <td><a href="/ViewBooks/Edit/@b.Id">Редактировать</a></td>
+                <td><a href="/ViewBooks/Delete/@b.Id">Удалить</a></td>
+            </tr>
+        }
     </table>
-    }
 </div>
