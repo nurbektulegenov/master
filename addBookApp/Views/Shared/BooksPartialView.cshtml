@@ -4,11 +4,18 @@
 <h2>Список книг</h2>
 
 <div>
+    <tr>
+        <td><p>Название книги</p></td>
+        <td><p>Автор</p></td>
+        <td></td>
+    </tr>
     @foreach (var b in Model)
     {
+    <table>
         <tr>
-            <td>@b.Name</td>
-            <td>@b.Author</td>
+            <td><p>@b.Name</p></td>
+            <td><p>@b.Author</p></td>
         </tr>
+    </table>
     }
 </div>

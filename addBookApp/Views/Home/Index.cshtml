@@ -2,11 +2,9 @@
     ViewBag.Title = "Home Page";
 }
     <div>
-        @using (Html.BeginForm("Save", "Save", FormMethod.Post))
-
 
         {
-            <form action="/Save/Save" method="post">
+            <form action="/Home/Save" method="post">
                 <p>Название книги</p>
                 <input type="text" name="Name" maxlenght="50" />
                 <p>Автор книги</p>

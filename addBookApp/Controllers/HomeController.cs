@@ -15,6 +15,13 @@ namespace addBookApp.Controllers
             return View();
         }
 
+        [HttpPost]
+        public void Save(Book book)
+        {
+            db.Books.Add(book);
+            db.SaveChanges();
+        }
+
         public ActionResult BooksPartialView()
         {
             
