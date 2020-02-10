@@ -9,20 +9,27 @@
     <script src="~/Scripts/jquery-3.3.1.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
     <script src="~/Scripts/jquery.validate.js"></script>
+    <link href="~/Content/Site.css" rel="stylesheet">
 </head>
 <body>
-    <div>
-        <form action="/Home/Save" method="post">
-            <p>Название книги</p>
-            <input type="text" name="Name" maxlenght="50" />
-            <p>Автор книги</p>
-            <input type="text" name="Author" maxlenght="50" />
-            <p>Книжный номер</p>
-            <input type="text" name="Isbn"/>
-            <input type="submit" value="Сохранить" />
-        </form>
-        <a href="/ViewBooks/ViewBooks">Просмотр</a>
-        <br /> <br />
-        @*@Html.Action("BooksPartialView","Home")*@
-    </div>
+<div>
+    <fieldset class="fieldset">
+        <div class="inputData">
+            <form action="/Home/Save" method="post">
+                <p>Название книги</p>
+                <input type="text" name="Name" maxlenght="50" />
+                <p>Автор книги</p>
+                <input type="text" name="Author" maxlenght="50" />
+                <p>Книжный номер</p>
+                <input type="text" name="Isbn"/>
+                <div>
+                    <input type="submit" value="Сохранить" />
+                    <a href="/ViewBooks/ViewBooks">Просмотр</a>
+                </div>
+            </form>
+            <br /> <br />
+            @*@Html.Action("BooksPartialView","Home")*@
+        </div>
+    </fieldset>
+</div>
 </body>

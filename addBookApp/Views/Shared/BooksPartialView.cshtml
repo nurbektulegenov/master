@@ -8,24 +8,32 @@
     <title>Partial View</title>
 </head>
 <body>
-    <h2>Список книг</h2>
-    <div>
-        <table>
-            <tr>
-                <td><h5>Название книги</h5></td>
-                <td><h5>Автор</h5></td>
-                <td><h5>Книжный номер</h5></td>
-                <td></td>
-            </tr>
-            @foreach (var b in Model) {
+<button class="btn btn-default" onclick="window.history.back()">Назад</button>
+<h2>Список книг</h2>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Название книги</th>
+            <th scope="col">Автор</th>
+            <th scope="col">Книжный номер</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var b in Model) {
+            @*for (int i = 1; i <= Model.Count(); i++) {
                 <tr>
-                    <td><p>@b.Name</p></td>
-                    <td><p>@b.Author</p></td>
-                    <td><p>@b.Isbn</p></td>
-                    <td><a href="../ViewBooks/Edit/@b.Id">Редактировать</a></td>
-                    <td><a href="../ViewBooks/Delete/@b.Id">Удалить</a></td>
+                    <th scope="row">i</th>
                 </tr>
-            }
-        </table>
-    </div>
+            }*@
+            <tr>
+                <td>@b.Name</td>
+                <td>@b.Author</td>
+                <td>@b.Isbn</td>
+                <td><a href="../ViewBooks/Edit/@b.Id">Редактировать</a></td>
+                <td><a href="../ViewBooks/Delete/@b.Id">Удалить</a></td>
+            </tr>
+        }</tbody>
+    </table>
+</div>
 </body>
