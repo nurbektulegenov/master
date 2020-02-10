@@ -1,10 +1,9 @@
-﻿
+﻿@model addBookApp.Models.Book
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -12,13 +11,38 @@
 </head>
 <body>
 <div>
-    <form action="/ViewBooks/EditBook" method="post">
+    <h2>Книга № @Model.Id</h2>
+    @using (Html.BeginForm("EditBook", "ViewBooks", FormMethod.Post))
+    {
+        <fieldset>
+            @Html.HiddenFor(m => m.Id)
+            <p>
+                @Html.LabelFor(m => m.Name, "Название книги")
+                <br />
+                @Html.EditorFor(m => m.Name)
+            </p>
+            <p>
+                @Html.LabelFor(m => m.Author, "Автор")
+                <br />
+                @Html.EditorFor(m=>m.Author)
+            </p>
+            <p>
+                @Html.LabelFor(m => m.Isbn, "Книжный номер")
+                <br />
+                @Html.EditorFor(m=>m.Isbn)
+            </p>
+            <p><input type="submit" value="Отправить" /></p>
+        </fieldset>
+    }
+    @*<form action="../ViewBooks/EditBook" method="post">
         <p>Название книги</p>
-        <input type="text" name="Name" maxlength="50" />
+        <input type="text" name="Name" maxlength="50"/>
         <p>Автор</p>
-        <input type="text" name="Author" maxlength="50" />
+        <input type="text" name="Author" maxlength="50"/>
+        <p>Книжный номер</p>
+        <input type="text" name="Isbn"/>
         <button type="submit">Сохранить</button>
-    </form>
+    </form>*@
 </div>
 </body>
 </html>

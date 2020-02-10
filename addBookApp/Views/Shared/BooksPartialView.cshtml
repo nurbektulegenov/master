@@ -1,23 +1,31 @@
 ﻿
 @model IEnumerable<addBookApp.Models.Book>
 
-<h2>Список книг</h2>
-
-<div>
-    <table>
-        <tr>
-            <td><h5>Название книги</h5></td>
-            <td><h5>Автор</h5></td>
-            <td></td>
-        </tr>
-        @foreach (var b in Model)
-        {
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partial View</title>
+</head>
+<body>
+    <h2>Список книг</h2>
+    <div>
+        <table>
             <tr>
-                <td><p>@b.Name</p></td>
-                <td><p>@b.Author</p></td>
-                <td><a href="/ViewBooks/Edit/@b.Id">Редактировать</a></td>
-                <td><a href="/ViewBooks/Delete/@b.Id">Удалить</a></td>
+                <td><h5>Название книги</h5></td>
+                <td><h5>Автор</h5></td>
+                <td><h5>Книжный номер</h5></td>
+                <td></td>
             </tr>
-        }
-    </table>
-</div>
+            @foreach (var b in Model) {
+                <tr>
+                    <td><p>@b.Name</p></td>
+                    <td><p>@b.Author</p></td>
+                    <td><p>@b.Isbn</p></td>
+                    <td><a href="../ViewBooks/Edit/@b.Id">Редактировать</a></td>
+                    <td><a href="../ViewBooks/Delete/@b.Id">Удалить</a></td>
+                </tr>
+            }
+        </table>
+    </div>
+</body>
