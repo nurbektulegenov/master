@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
@@ -66,14 +68,14 @@ namespace BookTestProject.Controllers
                 Value = a.Id.ToString(),
                 Text = a.UserName
             });
-            var book = db.Book.Include(b => b.Author).Select(b => new BookViewModel()
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Isbn = b.Isbn
-            }).SingleOrDefault(b => b.Id == id);
-            ViewData["AuthorName"] = AuthorName;
-            return View(book);
+            var book = db.Book.Single(b => b.Id == id);
+            ViewData["AuthorId"] = AuthorName;
+            return View(new BookViewModel {
+                Id = book.Id,
+                Name = book.Name,
+                AuthorId = book.AuthorId,
+                Isbn = book.Isbn
+            });
         }
 
         [HttpPost]
@@ -81,23 +83,19 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                Book _book = new Book()
-                {
-                    Name = book.Name,
-                    AuthorId = book.AuthorId,
-                    Isbn = book.Isbn
-                };
-                db.Entry(_book).State = EntityState.Modified;
+                var _bk = db.Book.Find(book.Id);
+                _bk.Name = book.Name;
+                _bk.AuthorId = book.AuthorId;
+                _bk.Isbn = book.Isbn;
                 db.SaveChanges();
                 return RedirectToAction("Index");
-            }
-            else
+            } else
             {
                 var bk = new BookViewModel()
                 {
                     Authors = GetSelectList()
                 };
-                return View("Edit",bk);
+                return View("Edit", bk);
             }
         }
 

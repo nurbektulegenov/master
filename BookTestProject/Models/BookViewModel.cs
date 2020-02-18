@@ -7,6 +7,7 @@ using BookTestProject.Entities;
 
 namespace BookTestProject.Models {
     public class BookViewModel : IValidatableObject {
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Заполните поле")]
