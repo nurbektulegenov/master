@@ -1,0 +1,53 @@
+﻿@model BookTestProject.Models.BookViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Добавление книги</title>
+    <link rel="stylesheet" href="~/Content/Site.css"/>
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+</head>
+<body>
+<div>
+    <fieldset class="fieldset">
+        <div class="inputData">
+            @using (Html.BeginForm())
+            {
+                <p>
+                    @Html.LabelFor(m => m.Name, "Название книги:")
+                    <br />
+                    @Html.EditorFor(m => m.Name)
+                    <br/>
+                    @Html.ValidationMessageFor(model => model.Name)
+                </p>
+                <p>
+                    @Html.LabelFor(m => m.AuthorName, "Автор:")
+                    <br />
+                    @Html.DropDownListFor( model=>model.AuthorName, Model.Authors)
+                    <br />
+                    @Html.ValidationMessageFor(model => model.AuthorId)
+                </p>
+                <p>
+                    @Html.LabelFor(m => m.Isbn, "Книжный номер:")
+                    <br />
+                    @Html.EditorFor(m => m.Isbn)
+                    <br />
+                    @Html.ValidationMessageFor(model => model.Isbn)
+                </p>
+                <div>
+                    <input type="submit" value="Сохранить" />
+                    <a class="btn btn-default" href="/Home/Index">Назад</a>
+                </div>
+            }
+        </div>
+    </fieldset>
+</div>
+</body>
+</html>
