@@ -4,8 +4,6 @@
 
         public string Name { get; set; }
 
-        //внешний ключ
-        public int AuthorId { get; set; }
         //свойство навигации
         public Author Author { get; set; }
 

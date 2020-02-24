@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Migrations;
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
 using BookTestProject.Models;
@@ -17,13 +12,11 @@ namespace BookTestProject.Controllers
         {
             var books = db.Book.Select(b => new BookViewModel()
             {
-                Id = b.Id,
                 Name = b.Name,
-                AuthorId = b.AuthorId,
+                Authors = GetAuthorsSelectList(),
                 AuthorName = b.Author.UserName,
                 Isbn = b.Isbn
             });
-            ViewBag.Book = books;
             return View("Index", books);
         }
 
@@ -32,12 +25,12 @@ namespace BookTestProject.Controllers
         {
             var model = new BookViewModel()
             {
-                Authors = GetSelectList()
+                Authors = GetAuthorsSelectList()
             };
             return View(model);
         }
 
-        private SelectList GetSelectList()
+        private SelectList GetAuthorsSelectList()
         {
             var authorName = db.Author.Select(a => new SelectListItem()
             {
@@ -48,33 +41,14 @@ namespace BookTestProject.Controllers
             return selctList;
         }
 
-        public JsonResult IsIsbnExists(string isbn)
-        {
-            var validate= db.Book.FirstOrDefault(x => x.Isbn == isbn);
-            if (validate != null) {
-                return Json(false, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(true, JsonRequestBehavior.AllowGet);
-            }
-        }
-
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            IEnumerable<SelectListItem> AuthorName = db.Author.Select(a => new SelectListItem()
-            {
-                Value = a.Id.ToString(),
-                Text = a.UserName
-            });
             var book = db.Book.Single(b => b.Id == id);
-            ViewData["AuthorId"] = AuthorName;
             return View(new BookViewModel {
-                Id = book.Id,
                 Name = book.Name,
-                AuthorId = book.AuthorId,
-                Isbn = book.Isbn
+                Isbn = book.Isbn,
+                Authors = GetAuthorsSelectList()
             });
         }
 
@@ -83,20 +57,18 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var _bk = db.Book.Find(book.Id);
-                _bk.Name = book.Name;
-                _bk.AuthorId = book.AuthorId;
-                _bk.Isbn = book.Isbn;
+                var bk = db.Book.Find(book.Id);
+                bk.Name = book.Name;
+                bk.Author.UserName = book.AuthorName;
+                bk.Isbn = book.Isbn;
                 db.SaveChanges();
                 return RedirectToAction("Index");
-            } else
-            {
-                var bk = new BookViewModel()
-                {
-                    Authors = GetSelectList()
-                };
-                return View("Edit", bk);
             }
+            var authors = new BookViewModel()
+            {
+                Authors = GetAuthorsSelectList()
+            };
+            return View("Edit", authors);
         }
 
         [HttpPost]
@@ -107,21 +79,18 @@ namespace BookTestProject.Controllers
                 Book _book = new Book()
                 {
                     Name = book.Name,
-                    AuthorId = Convert.ToInt32(book.AuthorName),
+                    Author = book.Author,
                     Isbn = book.Isbn
                 };
                 db.Book.Add(_book);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            else
+            var bk = new BookViewModel()
             {
-                var bk = new BookViewModel()
-                {
-                    Authors = GetSelectList()
-                };
-                return View(bk);
-            }
+                Authors = GetAuthorsSelectList()
+            };
+            return View(bk);
         }
 
         [HttpPost]

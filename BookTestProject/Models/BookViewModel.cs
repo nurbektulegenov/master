@@ -14,8 +14,8 @@ namespace BookTestProject.Models {
         [MaxLength(50, ErrorMessage = "Имя не долно быть больше 50 символов")]
         public string Name { get; set; }
 
-        public int AuthorId { get; set; }
         public string AuthorName { get; set; }
+        public Author Author { get; set; }
 
         [Required(ErrorMessage = "Заполните поле")]
         [Index("Ix_ProductName", Order = 1, IsUnique = true)]

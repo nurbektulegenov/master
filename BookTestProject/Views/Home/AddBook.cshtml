@@ -30,9 +30,9 @@
                 <p>
                     @Html.LabelFor(m => m.AuthorName, "Автор:")
                     <br />
-                    @Html.DropDownListFor( model=>model.AuthorName, Model.Authors)
+                    @Html.DropDownListFor( m=>m.AuthorName, Model.Authors)
                     <br />
-                    @Html.ValidationMessageFor(model => model.AuthorId)
+                    @Html.ValidationMessageFor(m => m.AuthorName)
                 </p>
                 <p>
                     @Html.LabelFor(m => m.Isbn, "Книжный номер:")

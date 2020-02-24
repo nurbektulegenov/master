@@ -13,10 +13,8 @@ namespace BookTestProject.Controllers
         public ActionResult Index()
         {
             var authors = db.Author.Select(a => new AuthorViewModel() {
-                Id = a.Id,
                 UserName = a.UserName
             });
-            ViewBag.Author = authors;
             return View("Index", authors);
         }
 
@@ -26,7 +24,8 @@ namespace BookTestProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddAuthor(AuthorViewModel author) {
+        public ActionResult AddAuthor(AuthorViewModel author)
+        {
             if (ModelState.IsValid)
             {
                 Author _author = new Author()
@@ -37,33 +36,28 @@ namespace BookTestProject.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            else {
-                return View();
-            }
+            return View();
         }
 
         [HttpGet]
         public ActionResult Edit(int id) {
             var author = db.Author.Include(b => b.Id).Select(b => new AuthorViewModel() {
-                Id=b.Id,
                 UserName = b.UserName
             }).SingleOrDefault(b => b.Id == id);
             return View(author);
         }
 
         [HttpPost]
-        public ActionResult SaveEdit(AuthorViewModel author) {
-            if (ModelState.IsValid) {
-                Author _author = new Author() {
-                    Id=author.Id,
-                    UserName = author.UserName
-                };
-                db.Entry(_author).State = EntityState.Modified;
+        public ActionResult SaveEdit(AuthorViewModel author)
+        {
+            if (ModelState.IsValid)
+            {
+                var _author = db.Author.Find(author.Id);
+                _author.UserName = author.UserName;
                 db.SaveChanges();
                 return RedirectToAction("Index");
-            } else {
-                return View("Edit", author);
             }
+            return View("Edit", author);
         }
 
         [HttpPost]
@@ -72,9 +66,20 @@ namespace BookTestProject.Controllers
             if(author!= null) {
                 db.Author.Remove(author);
                 db.SaveChanges();
-                ViewBag.Message = string.Format("Книга № [{0}] удалена!", id);
+                ViewBag.Message = string.Format("Автор [{0}] удален!", id);
             }
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult SearchBook(string name)
+        {
+            var books = db.Book.Where(a => a.Author.UserName.Contains(name)).ToList();
+            if (books.Count <= 0)
+            {
+                return HttpNotFound();
+            }
+            return PartialView(books.Count);
         }
     }
 }
