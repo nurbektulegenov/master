@@ -3,24 +3,17 @@
 @{
     ViewBag.Title = "Главная";
 }
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная</title>
-    <link href="~/Content/Site.css" rel="stylesheet">
-</head>
-<body>
-    <form action="/Home/AddBook">
-        <button class="btn btn-default">Добавить книгу</button>
-    </form>
-    <br />
-    <form action="/Author/Index">
-        <button class="btn btn-default">Авторы</button>
-    </form>
-    <h2>Список книг</h2>
     <div>
+        <form action="/Home/AddBook">
+            <button class="btn btn-secondary">Добавить книгу</button>
+        </form>
+        <br />
+        <form action="/Author/Index">
+            <button class="btn btn-secondary">Авторы</button>
+        </form>
+    </div>
+    <div>
+        <h2>Список книг</h2>
         <table class="table">
             <thead>
                 <tr>
@@ -40,7 +33,7 @@
                             @using (Html.BeginForm("Edit", "Home", FormMethod.Get))
                             {
                                 <input type="hidden" name="id" value="@b.Id">
-                                <input type="submit" class="btn" value="Редактировать" />
+                                <input type="submit" class="btn btn-outline-dark" value="Редактировать" />
                             }
                         </td>
                         <td>
@@ -55,5 +48,3 @@
             </tbody>
         </table>
     </div>
-</body>
-</html>

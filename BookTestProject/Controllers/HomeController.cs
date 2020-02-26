@@ -13,7 +13,6 @@ namespace BookTestProject.Controllers
             var books = db.Book.Select(b => new BookViewModel()
             {
                 Name = b.Name,
-                Authors = GetAuthorsSelectList(),
                 AuthorName = b.Author.UserName,
                 Isbn = b.Isbn
             });
@@ -79,7 +78,7 @@ namespace BookTestProject.Controllers
                 Book _book = new Book()
                 {
                     Name = book.Name,
-                    Author = book.Author,
+                    //Author = book.,
                     Isbn = book.Isbn
                 };
                 db.Book.Add(_book);

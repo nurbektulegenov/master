@@ -15,8 +15,6 @@ namespace BookTestProject.Models {
         public string Name { get; set; }
 
         public string AuthorName { get; set; }
-        public Author Author { get; set; }
-
         [Required(ErrorMessage = "Заполните поле")]
         [Index("Ix_ProductName", Order = 1, IsUnique = true)]
         [RegularExpression("[0-9-]{1,}", ErrorMessage = "ISBN некорректно заполнен")]

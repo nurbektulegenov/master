@@ -4,58 +4,45 @@
     ViewBag.Title = "Авторы";
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторы</title>
-    <link href="~/Content/Site.css" rel="stylesheet">
-    <script src='~/Scripts/AuthorsToBooks.js'></script>
-</head>
-<body>
+<div>
     <div>
         <form action="/Author/AddAuthor">
-            <button class="btn btn-default">Добавить автора</button>
+            <button class="btn btn-secondary">Добавить автора</button>
         </form>
         <br />
+    </div>
+    <div>
         <h2>Авторы</h2>
         <table class="table">
             <thead>
-                <tr>
-                    <th scope="col">Имя автора</th>
-                </tr>
+            <tr>
+                <th scope="col">Имя автора</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var a in Model)
-                {
-                    <tr>
-                        <td>@a.UserName</td>
-                        <td>
-                            @using (Html.BeginForm("Edit", "Author", FormMethod.Get))
-                            {
-                                <input type="hidden" name="id" value="@a.Id">
-                                <input type="submit" class="btn" value="Редактировать" />
-                            }
-                        </td>
-                        <td>
-                            @using (Ajax.BeginForm("Delete", "Author", new AjaxOptions()))
-                            {
-                                <input type="hidden" name="id" value="@a.Id">
-                                <input type="submit" onclick="return confirm('Вы уверены что хотите удалить?')" class="btn btn-danger" value="Удалить" />
-
-                            }
-                            @using (Html.BeginForm("Delete", "Author", FormMethod.Post))
-                            {
-                                <input type="hidden" name="id" value="@a.Id">
-                                <input type="submit" onclick="return confirm('Вы уверены что хотите удалить?')" class="btn btn-danger" value="Удалить" />
-                            }
-                        </td>
-                    </tr>
-                }
+            @foreach (var a in Model)
+            {
+                <tr>
+                    <td id="UserName">@a.UserName</td>
+                    <td>
+                        @using (Html.BeginForm("Edit", "Author", FormMethod.Get))
+                        {
+                            <input type="hidden" name="id" value="@a.Id">
+                            <input type="submit" class="btn btn-outline-dark" value="Редактировать" />
+                        }
+                    </td>
+                    <td>
+                        <input type="hidden" name="id" value="@a.Id">
+                        <input type="button" data-id="@a.UserName" class="btn btn-danger delete" value="Удалить" />
+                    </td>
+                </tr>
+            }
             </tbody>
         </table>
-        <a class="btn btn-default" href="/Home/Index">Назад</a>
     </div>
-</body>
-</html>
+    <a class="btn btn-primary" href="/Home/Index">Назад</a>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/AuthorsToBooks.js")
+}

@@ -1,53 +1,39 @@
 ﻿@model BookTestProject.Models.BookViewModel
 @{
-    Layout = null;
+    ViewBag.Title = "Добавление книги";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Добавление книги</title>
-    <link rel="stylesheet" href="~/Content/Site.css"/>
-    <script src="~/Scripts/jquery-3.3.1.js"></script>
-    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
-    <script src="~/Scripts/jquery.validate.js"></script>
-</head>
-<body>
 <div>
     <fieldset class="fieldset">
         <div class="inputData">
             @using (Html.BeginForm())
             {
-                <p>
+                <div class="form-group">
                     @Html.LabelFor(m => m.Name, "Название книги:")
                     <br />
                     @Html.EditorFor(m => m.Name)
                     <br/>
                     @Html.ValidationMessageFor(model => model.Name)
-                </p>
-                <p>
+                </div>
+                <div class="form-group">
                     @Html.LabelFor(m => m.AuthorName, "Автор:")
                     <br />
-                    @Html.DropDownListFor( m=>m.AuthorName, Model.Authors)
+                    @Html.DropDownListFor(m => m.AuthorName, Model.Authors)
                     <br />
                     @Html.ValidationMessageFor(m => m.AuthorName)
-                </p>
-                <p>
+                </div>
+                <div class="form-group">
                     @Html.LabelFor(m => m.Isbn, "Книжный номер:")
                     <br />
                     @Html.EditorFor(m => m.Isbn)
                     <br />
                     @Html.ValidationMessageFor(model => model.Isbn)
-                </p>
+                </div>
                 <div>
                     <input type="submit" value="Сохранить" />
-                    <a class="btn btn-default" href="/Home/Index">Назад</a>
+                    <a class="btn btn-secondary" href="/Home/Index">Назад</a>
                 </div>
             }
-        </div>
+            </div>
     </fieldset>
 </div>
-</body>
-</html>

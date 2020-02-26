@@ -10,7 +10,7 @@ namespace BookTestProject.Controllers
     {
         BookContext db = new BookContext();
         // GET
-        public ActionResult Index()
+        public ActionResult Index(string name)
         {
             var authors = db.Author.Select(a => new AuthorViewModel() {
                 UserName = a.UserName
@@ -60,26 +60,24 @@ namespace BookTestProject.Controllers
             return View("Edit", author);
         }
 
-        [HttpPost]
-        public ActionResult Delete(int id) {
-            Author author = db.Author.Find(id);
-            if(author!= null) {
-                db.Author.Remove(author);
-                db.SaveChanges();
-                ViewBag.Message = string.Format("Автор [{0}] удален!", id);
-            }
-            return RedirectToAction("Index");
+        [HttpGet]
+        public JsonResult BooksToAuthors(string name)
+        {
+            var count = db.Book.Where(a => a.Author.UserName == name).ToList().Count;
+            return Json(count, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public ActionResult SearchBook(string name)
+        public ActionResult Delete(string UserName)
         {
-            var books = db.Book.Where(a => a.Author.UserName.Contains(name)).ToList();
-            if (books.Count <= 0)
-            {
-                return HttpNotFound();
+            Author author = db.Author.Where(a=>a.UserName == UserName).FirstOrDefault();
+            if (author != null) {
+                db.Author.Remove(author);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            } else {
+                return Json(HttpNotFound());
             }
-            return PartialView(books.Count);
         }
     }
 }

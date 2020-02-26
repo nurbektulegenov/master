@@ -1,25 +1,15 @@
 ﻿@model BookTestProject.Models.AuthorViewModel
 @{
-    Layout = null;
+    ViewBag.Title = "Редактирование Автора";
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Редактирование</title>
-    <link href="~/Content/Site.css" rel="stylesheet">
-    <script src="~/Scripts/jquery-3.3.1.js"></script>
-    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
-    <script src="~/Scripts/jquery.validate.js"></script>
-</head>
-<body>
+<div>
     <div>
         <h2>Автор @Model.UserName</h2>
         @using (Html.BeginForm("SaveEdit", "Author", FormMethod.Post))
         {
             <fieldset class="fieldset">
-                <div class="inputData">
+                <div class="inputData form-group">
                     @Html.HiddenFor(m => m.Id)
                     <p>
                         @Html.LabelFor(m => m.UserName, "ФИО автора")
@@ -30,11 +20,10 @@
                     </p>
                     <div>
                         <input type="submit" value="Сохранить" />
-                        <a class="btn btn-default" href="/Author/Index">Назад</a>
+                        <a class="btn btn-secondary" href="/Author/Index">Назад</a>
                     </div>
                 </div>
             </fieldset>
         }
     </div>
-</body>
-</html>
+</div>
