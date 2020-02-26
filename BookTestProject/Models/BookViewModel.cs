@@ -7,7 +7,6 @@ using BookTestProject.Entities;
 
 namespace BookTestProject.Models {
     public class BookViewModel : IValidatableObject {
-        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Заполните поле")]
@@ -15,6 +14,7 @@ namespace BookTestProject.Models {
         public string Name { get; set; }
 
         public string AuthorName { get; set; }
+
         [Required(ErrorMessage = "Заполните поле")]
         [Index("Ix_ProductName", Order = 1, IsUnique = true)]
         [RegularExpression("[0-9-]{1,}", ErrorMessage = "ISBN некорректно заполнен")]
@@ -24,7 +24,7 @@ namespace BookTestProject.Models {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {   
             BookContext db = new BookContext();
-            var validateName = db.Book.FirstOrDefault(x => x.Isbn == Isbn && x.Id!=Id);
+            var validateName = db.Book.FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
             if (validateName != null)
             {
                 ValidationResult errorMessage = new ValidationResult("ISBN уже существует, введите другой ISBN", new[] { "Isbn" });

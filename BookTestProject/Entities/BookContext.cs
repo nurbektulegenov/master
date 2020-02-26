@@ -9,6 +9,10 @@ namespace BookTestProject.Entities {
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Author>()
+                .HasMany(a => a.Books)
+                .WithRequired(a => a.Authors)
+                .HasForeignKey(a=>a.AuthorId);
             modelBuilder.Entity<Book>().HasIndex(u => u.Isbn).IsUnique();
         }
     }

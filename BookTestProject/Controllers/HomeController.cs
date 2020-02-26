@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
 using BookTestProject.Models;
@@ -13,7 +14,7 @@ namespace BookTestProject.Controllers
             var books = db.Book.Select(b => new BookViewModel()
             {
                 Name = b.Name,
-                AuthorName = b.Author.UserName,
+                AuthorName = b.Authors.UserName,
                 Isbn = b.Isbn
             });
             return View("Index", books);
@@ -58,7 +59,7 @@ namespace BookTestProject.Controllers
             {
                 var bk = db.Book.Find(book.Id);
                 bk.Name = book.Name;
-                bk.Author.UserName = book.AuthorName;
+                bk.Authors.UserName = book.AuthorName;
                 bk.Isbn = book.Isbn;
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -78,7 +79,7 @@ namespace BookTestProject.Controllers
                 Book _book = new Book()
                 {
                     Name = book.Name,
-                    //Author = book.,
+                    AuthorId = Convert.ToInt32(book.AuthorName),
                     Isbn = book.Isbn
                 };
                 db.Book.Add(_book);
@@ -100,7 +101,6 @@ namespace BookTestProject.Controllers
             {
                 db.Book.Remove(book);
                 db.SaveChanges();
-                ViewBag.Message = string.Format("Книга № [{0}] удалена!", id);
             }
             return RedirectToAction("Index");
         }

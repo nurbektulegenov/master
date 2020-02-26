@@ -6,7 +6,9 @@ namespace BookTestProject.Entities{
 
         public string Name { get; set; }
 
-        public Author Author { get; set; }
+        public int AuthorId { get; set; }
+
+        public Author Authors { get; set; }
 
         public string Isbn { get; set; }
     }

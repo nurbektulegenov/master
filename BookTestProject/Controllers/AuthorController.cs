@@ -63,14 +63,14 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
-            var count = db.Book.Where(a => a.Author.UserName == name).ToList().Count;
+            var count = db.Book.Where(a => a.Authors.UserName == name).ToList().Count;
             return Json(count, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public ActionResult Delete(string UserName)
         {
-            Author author = db.Author.Where(a=>a.UserName == UserName).FirstOrDefault();
+            Author author = db.Author.FirstOrDefault(a=>a.UserName == UserName);
             if (author != null) {
                 db.Author.Remove(author);
                 db.SaveChanges();
