@@ -19,7 +19,7 @@
                 <th scope="col">Имя автора</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="tbBody">
             @foreach (var a in Model)
             {
                 <tr>
@@ -33,14 +33,14 @@
                     </td>
                     <td>
                         <input type="hidden" name="id" value="@a.Id">
-                        <input type="button" data-id="@a.UserName" class="btn btn-danger delete" value="Удалить" />
+                        <input type="button" data-name="@a.UserName" class="btn btn-danger delete" value="Удалить" />
                     </td>
                 </tr>
             }
             </tbody>
         </table>
     </div>
-    <a class="btn btn-primary" href="/Home/Index">Назад</a>
+    <a class="btn btn-primary" href="/">Назад</a>
 </div>
 
 @section Scripts {

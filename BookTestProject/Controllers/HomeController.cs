@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
@@ -11,13 +12,19 @@ namespace BookTestProject.Controllers
         BookContext db = new BookContext();
         public ActionResult Index()
         {
+            return View();
+        }
+
+        public ActionResult GetBookData()
+        {
             var books = db.Book.Select(b => new BookViewModel()
             {
+                Id=b.Id,
                 Name = b.Name,
                 AuthorName = b.Authors.UserName,
                 Isbn = b.Isbn
-            });
-            return View("Index", books);
+            }).ToArray();
+            return Json(new {data = books}, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -36,7 +43,7 @@ namespace BookTestProject.Controllers
             {
                 Value = a.Id.ToString(),
                 Text = a.UserName
-            });
+            }).ToArray();
             var selctList = new SelectList(authorName, "Value", "Text");
             return selctList;
         }
@@ -45,12 +52,26 @@ namespace BookTestProject.Controllers
         public ActionResult Edit(int id)
         {
             var book = db.Book.Single(b => b.Id == id);
-            return View(new BookViewModel {
+            return View(new BookViewModel
+            {
                 Name = book.Name,
                 Isbn = book.Isbn,
                 Authors = GetAuthorsSelectList()
             });
         }
+
+        //[HttpGet]
+        //public ActionResult Edit(int id)
+        //{
+        //    var book = db.Book.Single(b => b.Id == id);
+        //    var books = new BookViewModel()
+        //    {
+        //        Name = book.Name,
+        //        Authors = GetAuthorsSelectList(),
+        //        Isbn = book.Isbn
+        //    };
+        //    return PartialView("PartialViews/EditBook", books);
+        //}
 
         [HttpPost]
         public ActionResult EditBook(BookViewModel book)

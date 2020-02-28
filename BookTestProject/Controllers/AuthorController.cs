@@ -10,11 +10,11 @@ namespace BookTestProject.Controllers
     {
         BookContext db = new BookContext();
         // GET
-        public ActionResult Index(string name)
+        public ActionResult Index()
         {
             var authors = db.Author.Select(a => new AuthorViewModel() {
                 UserName = a.UserName
-            });
+            }).ToArray();
             return View("Index", authors);
         }
 
@@ -71,13 +71,13 @@ namespace BookTestProject.Controllers
         public ActionResult Delete(string UserName)
         {
             Author author = db.Author.FirstOrDefault(a=>a.UserName == UserName);
-            if (author != null) {
+            if (author != null)
+            {
                 db.Author.Remove(author);
                 db.SaveChanges();
                 return RedirectToAction("Index");
-            } else {
-                return Json(HttpNotFound());
             }
+            return Json(HttpNotFound());
         }
     }
 }

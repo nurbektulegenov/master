@@ -1,50 +1,32 @@
-﻿@model IEnumerable<BookTestProject.Models.BookViewModel>
-
-@{
+﻿@{
     ViewBag.Title = "Главная";
 }
-    <div>
-        <form action="/Home/AddBook">
-            <button class="btn btn-secondary">Добавить книгу</button>
-        </form>
-        <br />
-        <form action="/Author/Index">
-            <button class="btn btn-secondary">Авторы</button>
-        </form>
+<script>
+    $(function() {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true,
+            title: "Редактирование книги"
+        });
+    });
+</script>
+<div>
+    <form action="/Home/AddBook">
+        <button class="btn btn-secondary">Добавить книгу</button>
+    </form>
+    <br />
+    <form action="/Author/Index">
+        <button class="btn btn-secondary">Авторы</button>
+    </form>
+</div>
+<div>
+    <h2>Список книг</h2>
+    <div id="updatePanel" style="padding: 20px;">
     </div>
-    <div>
-        <h2>Список книг</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Название книги</th>
-                    <th scope="col">Автор</th>
-                    <th scope="col">Книжный номер</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var b in Model)
-                {
-                    <tr>
-                        <td>@b.Name</td>
-                        <td>@b.AuthorName</td>
-                        <td>@b.Isbn</td>
-                        <td>
-                            @using (Html.BeginForm("Edit", "Home", FormMethod.Get))
-                            {
-                                <input type="hidden" name="id" value="@b.Id">
-                                <input type="submit" class="btn btn-outline-dark" value="Редактировать" />
-                            }
-                        </td>
-                        <td>
-                            @using (Html.BeginForm("Delete", "Home", FormMethod.Post))
-                            {
-                                <input type="hidden" name="id" value="@b.Id">
-                                <input type="submit" onclick="return confirm('Вы уверены что хотите удалить?')" class="btn btn-danger" value="Удалить" />
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div id="dialog" style="display: none; background-color: bisque;">
+
     </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/Scripts/Books.js")
+}
