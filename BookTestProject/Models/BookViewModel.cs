@@ -20,6 +20,13 @@ namespace BookTestProject.Models {
         [RegularExpression("[0-9-]{1,}", ErrorMessage = "ISBN некорректно заполнен")]
         public string Isbn { get; set; }
 
+        public int PageIndex { get; set; }
+
+        public int PageSize { get; set; }
+
+        public int RecordCount { get; set; }
+        public List<Book> Books { get; set; }
+
         public SelectList Authors { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {   

@@ -15,15 +15,22 @@ namespace BookTestProject.Controllers
             return View();
         }
 
-        public ActionResult GetBookData()
+        [HttpPost]
+        public ActionResult GetBookData(int pageIndex)
         {
+            BookViewModel _books = new BookViewModel();
+            _books.PageIndex = pageIndex;
+            _books.PageSize = 20;
+            _books.RecordCount = db.Book.Count();
+            int startIndex = (pageIndex - 1) * _books.PageSize;
+
             var books = db.Book.Select(b => new BookViewModel()
             {
                 Id=b.Id,
                 Name = b.Name,
                 AuthorName = b.Authors.UserName,
                 Isbn = b.Isbn
-            }).ToArray();
+            }).Skip(startIndex).Take(_books.PageSize).ToArray();
             return Json(new {data = books}, JsonRequestBehavior.AllowGet);
         }
 
