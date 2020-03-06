@@ -5,6 +5,7 @@ namespace BookTestProject.Entities {
         public BookContext() : base("DbConnection") { }
         public DbSet<Book> Book { get; set; }
         public DbSet<Author> Author { get; set; }
+        public DbSet<TotalCount> TotalCount { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

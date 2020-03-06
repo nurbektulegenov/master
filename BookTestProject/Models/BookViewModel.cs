@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -20,12 +21,11 @@ namespace BookTestProject.Models {
         [RegularExpression("[0-9-]{1,}", ErrorMessage = "ISBN некорректно заполнен")]
         public string Isbn { get; set; }
 
-        public int PageIndex { get; set; }
+        public int PagesSize { get; set; }
 
-        public int PageSize { get; set; }
+        public int RowsCount { get; set; }
 
-        public int RecordCount { get; set; }
-        public List<Book> Books { get; set; }
+        public List<BookViewModel> Books { get; set; }
 
         public SelectList Authors { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BookTestProject.Entities{
+﻿namespace BookTestProject.Entities{
     public class Book{
         public int Id { get; set; }
 

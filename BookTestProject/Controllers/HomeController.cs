@@ -19,19 +19,11 @@ namespace BookTestProject.Controllers
         public ActionResult GetBookData(int pageIndex)
         {
             BookViewModel _books = new BookViewModel();
-            _books.PageIndex = pageIndex;
-            _books.PageSize = 20;
-            _books.RecordCount = db.Book.Count();
-            int startIndex = (pageIndex - 1) * _books.PageSize;
-
-            var books = db.Book.Select(b => new BookViewModel()
-            {
-                Id=b.Id,
-                Name = b.Name,
-                AuthorName = b.Authors.UserName,
-                Isbn = b.Isbn
-            }).Skip(startIndex).Take(_books.PageSize).ToArray();
-            return Json(new {data = books}, JsonRequestBehavior.AllowGet);
+            _books.RowsCount = 20;
+            _books.PagesSize = Convert.ToInt32(db.TotalCount.Select(a => a.BooksCount));
+            int startIndex = (pageIndex - 1) * _books.RowsCount;
+            _books.Books = GetBooks(startIndex, _books);
+            return Json(new {data = _books }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -42,6 +34,16 @@ namespace BookTestProject.Controllers
                 Authors = GetAuthorsSelectList()
             };
             return View(model);
+        }
+
+        private List<BookViewModel> GetBooks(int startIndex, BookViewModel _books) {
+            var books = db.Book.Select(b => new BookViewModel() {
+                Id = b.Id,
+                Name = b.Name,
+                AuthorName = b.Authors.UserName,
+                Isbn = b.Isbn
+            }).OrderBy(u => u.Id).Skip(startIndex).Take(_books.RowsCount).ToList();
+            return books;
         }
 
         private SelectList GetAuthorsSelectList()
@@ -102,6 +104,7 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult AddBook(BookViewModel book)
         {
+            TotalCount count = new TotalCount();
             if (ModelState.IsValid)
             {
                 Book _book = new Book()
@@ -111,6 +114,9 @@ namespace BookTestProject.Controllers
                     Isbn = book.Isbn
                 };
                 db.Book.Add(_book);
+                long total = Convert.ToInt64(db.TotalCount.Select(a=>a.BooksCount));
+                total += 1;
+                count.BooksCount = total;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -124,10 +130,14 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
+            TotalCount count = new TotalCount();
             Book book = db.Book.Find(id);
             if (book != null)
             {
                 db.Book.Remove(book);
+                long total = Convert.ToInt64(db.TotalCount.Select(a => a.BooksCount));
+                total -= 1;
+                count.BooksCount = total;
                 db.SaveChanges();
             }
             return RedirectToAction("Index");
