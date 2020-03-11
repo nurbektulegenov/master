@@ -10,9 +10,13 @@ namespace BookTestProject.Controllers
     public class HomeController : Controller
     {
         BookContext db = new BookContext();
-        public ActionResult Index()
+        public ActionResult Index(int page = 1)
         {
-            return View();
+            int pageSize = 3; // количество объектов на страницу
+            IEnumerable<Book> booksPerPages = db.Book.Skip((page - 1) * pageSize).Take(pageSize);
+            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = db.Book.OrderBy(b=>b.Id).Count };
+            IndexViewModel ivm = new IndexViewModel { PageInfo = pageInfo, Books = booksPerPages };
+            return View(ivm);
         }
 
         public ActionResult GetBookData()

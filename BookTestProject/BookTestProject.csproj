@@ -138,6 +138,7 @@
     <Compile Include="Entities\Author.cs" />
     <Compile Include="Entities\Book.cs" />
     <Compile Include="Entities\BookContext.cs" />
+    <Compile Include="Helpers\PagingHelpers.cs" />
     <Compile Include="Models\AuthorViewModel.cs" />
     <Compile Include="Models\BookViewModel.cs" />
     <Compile Include="Models\DataViewModel.cs" />
