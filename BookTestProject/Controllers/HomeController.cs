@@ -20,7 +20,7 @@ namespace BookTestProject.Controllers
         public ActionResult GetBookData(int pageIndex=1)
         {
             BookViewModel _books = new BookViewModel();
-            _books.RowsCount = 10000;
+            _books.RowsCount = 500000;
             _books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * _books.RowsCount;
             _books.Books = GetBooks(startIndex, _books);
