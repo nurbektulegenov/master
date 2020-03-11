@@ -21,7 +21,7 @@ namespace BookTestProject.Models {
         [RegularExpression("[0-9-]{1,}", ErrorMessage = "ISBN некорректно заполнен")]
         public string Isbn { get; set; }
 
-        public int PagesSize { get; set; }
+        public long PagesSize { get; set; }
 
         public int RowsCount { get; set; }
 

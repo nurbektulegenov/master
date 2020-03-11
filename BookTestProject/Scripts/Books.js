@@ -1,61 +1,52 @@
-﻿$(document).ready(function() {
-    function template(data) {
-        var html = '<ul>';
-        $.each(data, function (index, item) {
-            html += '<li>' + item + '</li>';
-        });
-        html += '</ul>';
-        return html;
-    }
-
+﻿$(document).ready(function () {
     $(function () {
-        var container = $('#pagination-bar');
-        container.pagination({
-            dataSource: loadData(1),
-            pageSize: 20,
+        $('#pagination-bar').pagination({
+            dataSource: function (done) {
+                $.ajax({
+                    type: 'post',
+                    url: 'Home/GetBookData',
+                    data: { pageIndex: 1 },
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log(response.data.Books);
+                        console.log(response.data.PagesSize);
+                        done(response.data.Books);
+                    },
+                    error: function () {
+                        alert('Error!');
+                    }
+                });
+            },
+            ajax: {
+                beforeSend: function () {
+                    $('#pagination-data-container').html('Загрузка...');
+                }
+            },
             callback: function (data, pagination) {
                 var html = template(data);
                 $('#pagination-data-container').html(html);
             }
         });
     });
-
-    function loadData(pageIndex) {
-        $.ajax({
-            type: 'post',
-            url: 'Home/GetBookData',
-            data: { pageIndex: pageIndex },
-            dataType: 'json',
-            success: onSuccess(),
-            error: function() {
-                alert('Error!');
-            }
-        });
-    }
-
-    function onSuccess(response) {
+    function template(data) {
         var $table = $('<table/>').addClass('dataTable table table-striped');
         var $header = $('<thead/>').html('<tr><th>Книга</th><th>Автор</th><th>Isbn</th><th>Действия</th></tr>');
         $table.append($header);
-        $.each(response, function(i, value) {
-            $.each(value, function (index, val) {
-                var $row = $('<tr/>');
-                var bookId = val.Id;
-                $row.append($('<td/>').html(val.Name));
-                $row.append($('<td/>').html(val.AuthorName));
-                $row.append($('<td/>').html(val.Isbn));
-                $row.append($('<td/>').html('<div data-id="' + bookId + '" class="actions">' +
-                            '<input type="submit" class="btn btn-outline-dark edit" value="Редактировать" />' +
-                            '<input type="button" class="btn btn-danger delete" value="Удалить" />' + '</div>'));
-                $table.append($row);
-                $.count = val.PagesSize;
-            });
+        $.each(data, function (index, value) {
+            var $row = $('<tr/>');
+            var bookId = value.Id;
+            $row.append($('<td/>').html(value.Name));
+            $row.append($('<td/>').html(value.AuthorName));
+            $row.append($('<td/>').html(value.Isbn));
+            $row.append($('<td/>').html('<div data-id="' + bookId + '" class="actions">' +
+                '<input type="submit" class="btn btn-outline-dark edit" value="Редактировать" />' +
+                '<input type="button" class="btn btn-danger delete" value="Удалить" />' + '</div>'));
+            $table.append($row);
         });
-        $('#updatePanel').html($table);
+        $('#pagination-data-container').html($table);
         var bookId = $(".actions").data("id");
         editButtonClick(bookId);
         deleteButtonClick(bookId);
-        return response;
     }
 
     function deleteButtonClick(id) {

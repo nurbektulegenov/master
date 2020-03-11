@@ -12,6 +12,7 @@ namespace BookTestProject.Controllers
         BookContext db = new BookContext();
         public ActionResult Index()
         {
+            ViewBag.BooksCount = GetBooksCount();
             return View();
         }
 
@@ -20,7 +21,7 @@ namespace BookTestProject.Controllers
         {
             BookViewModel _books = new BookViewModel();
             _books.RowsCount = 20;
-            _books.PagesSize = Convert.ToInt32(db.TotalCount.Select(a => a.BooksCount));
+            _books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * _books.RowsCount;
             _books.Books = GetBooks(startIndex, _books);
             return Json(new {data = _books }, JsonRequestBehavior.AllowGet);
@@ -36,6 +37,10 @@ namespace BookTestProject.Controllers
             return View(model);
         }
 
+        private long GetBooksCount()
+        {
+            return db.TotalCount.Select(a => a.BooksCount).First();
+        }
         private List<BookViewModel> GetBooks(int startIndex, BookViewModel _books) {
             var books = db.Book.Select(b => new BookViewModel() {
                 Id = b.Id,
