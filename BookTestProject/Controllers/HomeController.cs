@@ -27,6 +27,13 @@ namespace BookTestProject.Controllers
             return Json(new {data = _books }, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public JsonResult GetBooksForSearch(string name)
+        {
+            var books = db.Book.Select(b => b.Name.Contains(name)).ToList();
+            return Json(new { data = books }, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpGet]
         public ActionResult AddBook()
         {
