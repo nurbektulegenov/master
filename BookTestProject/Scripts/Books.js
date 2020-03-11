@@ -5,7 +5,7 @@
                 $.ajax({
                     type: 'post',
                     url: 'Home/GetBookData',
-                    data: { pageIndex: 1 },
+                    data: {  },
                     dataType: 'json',
                     success: function (response) {
                         console.log(response.data.Books);
@@ -17,6 +17,7 @@
                     }
                 });
             },
+            pageSize: 20,
             ajax: {
                 beforeSend: function () {
                     $('#pagination-data-container').html('Загрузка...');

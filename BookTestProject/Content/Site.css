@@ -68,3 +68,25 @@ textarea {
     line-height: 150%;
     text-decoration: none;
 }
+
+#pagination-bar {
+    height: 100px;
+}
+.paginationjs .paginationjs-pages li > a {
+    width: 50px;
+    min-width: 30px;
+    height: 28px;
+    line-height: 28px;
+    display: block;
+    background: #fff;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    text-align: center;
+}
+.paginationjs .paginationjs-pages li {
+    float: left;
+    border: 1px solid #aaa;
+    border-right: none;
+    list-style: none;
+}
