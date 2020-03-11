@@ -20,7 +20,7 @@ namespace BookTestProject.Controllers
         public ActionResult GetBookData(int pageIndex=1)
         {
             BookViewModel _books = new BookViewModel();
-            _books.RowsCount = 2000;
+            _books.RowsCount = 10000;
             _books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * _books.RowsCount;
             _books.Books = GetBooks(startIndex, _books);
@@ -65,7 +65,7 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            var book = db.Book.Single(b => b.Id == id);
+            var book = db.Book.Find(id);
             return View(new BookViewModel
             {
                 Name = book.Name,
@@ -119,7 +119,7 @@ namespace BookTestProject.Controllers
                     Isbn = book.Isbn
                 };
                 db.Book.Add(_book);
-                long total = Convert.ToInt64(db.TotalCount.Select(a=>a.BooksCount));
+                long total = db.TotalCount.Select(a => a.BooksCount).First();
                 total += 1;
                 count.BooksCount = total;
                 db.SaveChanges();
@@ -140,7 +140,7 @@ namespace BookTestProject.Controllers
             if (book != null)
             {
                 db.Book.Remove(book);
-                long total = Convert.ToInt64(db.TotalCount.Select(a => a.BooksCount));
+                long total = db.TotalCount.Select(a => a.BooksCount).First();
                 total -= 1;
                 count.BooksCount = total;
                 db.SaveChanges();
