@@ -17,10 +17,10 @@ namespace BookTestProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetBookData(int pageIndex=1)
+        public ActionResult GetBookData(int pageIndex = 1)
         {
             BookViewModel _books = new BookViewModel();
-            _books.RowsCount = 500000;
+            _books.RowsCount = 500;
             _books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * _books.RowsCount;
             _books.Books = GetBooks(startIndex, _books);
@@ -65,8 +65,8 @@ namespace BookTestProject.Controllers
                 Value = a.Id.ToString(),
                 Text = a.UserName
             }).ToArray();
-            var selctList = new SelectList(authorName, "Value", "Text");
-            return selctList;
+            var selectList = new SelectList(authorName, "Value", "Text");
+            return selectList;
         }
 
         [HttpGet]

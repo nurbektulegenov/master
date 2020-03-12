@@ -8,8 +8,6 @@
                     data: {  },
                     dataType: 'json',
                     success: function (response) {
-                        console.log(response.data.Books);
-                        console.log(response.data.PagesSize);
                         done(response.data.Books);
                     },
                     error: function () {
@@ -17,35 +15,33 @@
                     }
                 });
             },
-            pageSize: 20,
+            pageSize: 5,
             ajax: {
                 beforeSend: function () {
-                    $('#pagination-data-container').html('Загрузка...');
+                    $('.tableBody').html('Загрузка...');
                 }
             },
             callback: function (data, pagination) {
-                var html = template(data);
+                console.log(data);
+                let html = template(data);
                 $('#pagination-data-container').html(html);
             }
         });
     });
     function template(data) {
-        var $table = $('<table/>').addClass('dataTable table table-striped');
-        var $header = $('<thead/>').html('<tr><th>Книга</th><th>Автор</th><th>Isbn</th><th>Действия</th></tr>');
-        $table.append($header);
+        let $table = $('.tableBody');
+        $("tr:has(td)").remove();
         $.each(data, function (index, value) {
-            var $row = $('<tr/>');
-            var bookId = value.Id;
-            $row.append($('<td/>').html(value.Name));
-            $row.append($('<td/>').html(value.AuthorName));
-            $row.append($('<td/>').html(value.Isbn));
-            $row.append($('<td/>').html('<div data-id="' + bookId + '" class="actions">' +
+            let $row = $('<tr/>');
+            $row.append($('<td/>').text(value.Name));
+            $row.append($('<td/>').text(value.AuthorName));
+            $row.append($('<td/>').text(value.Isbn));
+            $row.append($('<td/>').html('<div data-id="' + value.Id + '" class="actions">' +
                 '<input type="submit" class="btn btn-outline-dark edit" value="Редактировать" />' +
                 '<input type="button" class="btn btn-danger delete" value="Удалить" />' + '</div>'));
             $table.append($row);
         });
-        $('#pagination-data-container').html($table);
-        var bookId = $(".actions").data("id");
+        let bookId = $(".actions").data("id");
         editButtonClick(bookId);
         deleteButtonClick(bookId);
     }
