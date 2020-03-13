@@ -24,15 +24,15 @@ namespace BookTestProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddAuthor(AuthorViewModel author)
+        public ActionResult AddAuthor(AuthorViewModel authorViewModel)
         {
             if (ModelState.IsValid)
             {
-                Author _author = new Author()
+                Author author = new Author()
                 {
-                    UserName = author.UserName
+                    UserName = authorViewModel.UserName
                 };
-                db.Author.Add(_author);
+                db.Author.Add(author);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -48,16 +48,16 @@ namespace BookTestProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveEdit(AuthorViewModel author)
+        public ActionResult SaveEdit(AuthorViewModel authorViewModel)
         {
             if (ModelState.IsValid)
             {
-                var _author = db.Author.Find(author.Id);
-                _author.UserName = author.UserName;
+                var author = db.Author.Find(authorViewModel.Id);
+                author.UserName = authorViewModel.UserName;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View("Edit", author);
+            return View("Edit", authorViewModel);
         }
 
         [HttpGet]
@@ -68,9 +68,9 @@ namespace BookTestProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(string UserName)
+        public ActionResult Delete(string userName)
         {
-            Author author = db.Author.FirstOrDefault(a=>a.UserName == UserName);
+            Author author = db.Author.FirstOrDefault(a=>a.UserName == userName);
             if (author != null)
             {
                 db.Author.Remove(author);

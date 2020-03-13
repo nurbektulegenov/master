@@ -12,19 +12,18 @@ namespace BookTestProject.Controllers
         BookContext db = new BookContext();
         public ActionResult Index()
         {
-            ViewBag.BooksCount = GetBooksCount();
             return View();
         }
 
         [HttpPost]
         public ActionResult GetBookData(int pageIndex = 1)
         {
-            BookViewModel _books = new BookViewModel();
-            _books.RowsCount = 10000;
-            _books.PagesSize = GetBooksCount();
-            int startIndex = (pageIndex - 1) * _books.RowsCount;
-            _books.Books = GetBooks(startIndex, _books);
-            return Json(new {data = _books }, JsonRequestBehavior.AllowGet);
+            BookViewModel books = new BookViewModel();
+            books.RowsCount = 10000;
+            books.PagesSize = GetBooksCount();
+            int startIndex = (pageIndex - 1) * books.RowsCount;
+            books.Books = GetBooks(startIndex, books);
+            return Json(new {data = books }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -48,14 +47,14 @@ namespace BookTestProject.Controllers
         {
             return db.TotalCount.Select(a => a.BooksCount).First();
         }
-        private List<BookViewModel> GetBooks(int startIndex, BookViewModel _books) {
-            var books = db.Book.Select(b => new BookViewModel() {
+        private List<BookViewModel> GetBooks(int startIndex, BookViewModel books) {
+            var booksList = db.Book.Select(b => new BookViewModel() {
                 Id = b.Id,
                 Name = b.Name,
                 AuthorName = b.Authors.UserName,
                 Isbn = b.Isbn
-            }).OrderBy(u => u.Id).Skip(startIndex).Take(_books.RowsCount).ToList();
-            return books;
+            }).OrderBy(u => u.Id).Skip(startIndex).Take(books.RowsCount).ToList();
+            return booksList;
         }
 
         private SelectList GetAuthorsSelectList()
@@ -81,19 +80,6 @@ namespace BookTestProject.Controllers
             });
         }
 
-        //[HttpGet]
-        //public ActionResult Edit(int id)
-        //{
-        //    var book = db.Book.Single(b => b.Id == id);
-        //    var books = new BookViewModel()
-        //    {
-        //        Name = book.Name,
-        //        Authors = GetAuthorsSelectList(),
-        //        Isbn = book.Isbn
-        //    };
-        //    return PartialView("PartialViews/EditBook", books);
-        //}
-
         [HttpPost]
         public ActionResult EditBook(BookViewModel book)
         {
@@ -114,23 +100,27 @@ namespace BookTestProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddBook(BookViewModel book)
+        public ActionResult AddBook(BookViewModel bookViewModel)
         {
             TotalCount count = new TotalCount();
             if (ModelState.IsValid)
             {
-                Book _book = new Book()
+                Book book = new Book()
                 {
-                    Name = book.Name,
-                    AuthorId = Convert.ToInt32(book.AuthorName),
-                    Isbn = book.Isbn
+                    Name = bookViewModel.Name,
+                    AuthorId = Convert.ToInt32(bookViewModel.AuthorName),
+                    Isbn = bookViewModel.Isbn
                 };
-                db.Book.Add(_book);
+                db.Book.Add(book);
                 long total = db.TotalCount.Select(a => a.BooksCount).First();
                 total += 1;
                 count.BooksCount = total;
                 db.SaveChanges();
                 return RedirectToAction("Index");
+                /*return RedirectToRoutePermanent(new {
+                    Controller = "Home",
+                    Action = "Index"
+                });*/
             }
             var bk = new BookViewModel()
             {
