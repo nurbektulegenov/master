@@ -1,4 +1,9 @@
 ﻿$(document).ready(function () {
+    $(document).ajaxStart(function(){
+        $("#loading").show();
+    }).ajaxStop(function() {
+        $("#loading").hide();
+    });
     $(function () {
         $('#pagination-bar').pagination({
             dataSource: function (done) {
@@ -15,10 +20,10 @@
                     }
                 });
             },
-            pageSize: 5,
+            pageSize: 10,
             ajax: {
                 beforeSend: function () {
-                    $('.tableBody').html('Загрузка...');
+                    $('#pagination-data-container').html('Загрузка....');
                 }
             },
             callback: function (data, pagination) {
