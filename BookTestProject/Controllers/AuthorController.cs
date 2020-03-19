@@ -2,19 +2,23 @@
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
+using BookTestProject.Interfaces;
 using BookTestProject.Models;
+using BookTestProject.Repository;
 
 namespace BookTestProject.Controllers
 {
     public class AuthorController : Controller
     {
-        BookContext db = new BookContext();
+        private IRepository entity;
+        public AuthorController()
+        {
+            entity = new EntityFrameworkRepository();
+        }
         // GET
         public ActionResult Index()
         {
-            var authors = db.Author.Select(a => new AuthorViewModel() {
-                UserName = a.UserName
-            }).ToArray();
+            var authors = entity.GetAuthorsList();
             return View("Index", authors);
         }
 
@@ -32,18 +36,17 @@ namespace BookTestProject.Controllers
                 {
                     UserName = authorViewModel.UserName
                 };
-                db.Author.Add(author);
-                db.SaveChanges();
+                entity.CreateAuthor(author);
+                entity.Save();
                 return RedirectToAction("Index");
             }
             return View();
         }
 
         [HttpGet]
-        public ActionResult Edit(int id) {
-            var author = db.Author.Include(b => b.Id).Select(b => new AuthorViewModel() {
-                UserName = b.UserName
-            }).SingleOrDefault(b => b.Id == id);
+        public ActionResult Edit(int id)
+        {
+            var author = entity.GetAuthorForEdit(id);
             return View(author);
         }
 
@@ -52,32 +55,27 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var author = db.Author.Find(authorViewModel.Id);
+                var author = entity.GetAuthor(authorViewModel.Id);
                 author.UserName = authorViewModel.UserName;
-                db.SaveChanges();
+                entity.Save();
                 return RedirectToAction("Index");
             }
             return View("Edit", authorViewModel);
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
             var count = db.Book.Where(a => a.Authors.UserName == name).ToList().Count;
             return Json(count, JsonRequestBehavior.AllowGet);
-        }
+        }*/
 
         [HttpPost]
         public ActionResult Delete(string userName)
         {
-            Author author = db.Author.FirstOrDefault(a=>a.UserName == userName);
-            if (author != null)
-            {
-                db.Author.Remove(author);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return Json(HttpNotFound());
+            entity.DeleteAuthor(userName);
+            entity.Save();
+            return RedirectToAction("Index");
         }
     }
 }
