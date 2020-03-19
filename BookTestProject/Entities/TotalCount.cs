@@ -1,7 +1,7 @@
 ﻿namespace BookTestProject.Entities {
     public class TotalCount
     {
-        public int Id { get; set; }
-        public long BooksCount { get; set; }
+        public virtual int Id { get; set; }
+        public virtual long BooksCount { get; set; }
     }
 }

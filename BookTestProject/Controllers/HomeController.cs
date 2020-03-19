@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
+using BookTestProject.Helpers;
 using BookTestProject.Models;
+using NHibernate;
 
 namespace BookTestProject.Controllers
 {
     public class HomeController : Controller
     {
         BookContext db = new BookContext();
+        private ISession _session = NHibernateHelper.SessionFactory.OpenSession();
         public ActionResult Index()
         {
             return View();
@@ -85,7 +88,7 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var bk = db.Book.Find(book.Id);
+                var bk = _session.Get<Book>(book.Id);
                 bk.Name = book.Name;
                 bk.Authors.UserName = book.AuthorName;
                 bk.Isbn = book.Isbn;
