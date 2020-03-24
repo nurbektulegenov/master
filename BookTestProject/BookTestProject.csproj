@@ -168,7 +168,6 @@
     </Compile>
     <Compile Include="Entities\Author.cs" />
     <Compile Include="Entities\Book.cs" />
-    <Compile Include="Entities\BookContext.cs" />
     <Compile Include="Helpers\FluentNHibernateHelper.cs" />
     <Compile Include="Mapping\AuthorMap.cs" />
     <Compile Include="Mapping\BookMap.cs" />

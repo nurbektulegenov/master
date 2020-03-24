@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
+using BookTestProject.Helpers;
+using NHibernate;
 
 namespace BookTestProject.Models {
     public class BookViewModel : IValidatableObject {
@@ -29,16 +31,20 @@ namespace BookTestProject.Models {
 
         public SelectList Authors { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {   
-            BookContext db = new BookContext();
-            var validateName = db.Book.FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
-            if (validateName != null)
+        {
+            using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                ValidationResult errorMessage = new ValidationResult("ISBN уже существует, введите другой ISBN", new[] { "Isbn" });
-                yield return errorMessage;
-            } else
-            {
-                yield return ValidationResult.Success;
+                var validateName = session.Query<Book>().FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
+                if (validateName != null)
+                {
+                    ValidationResult errorMessage =
+                        new ValidationResult("ISBN уже существует, введите другой ISBN", new[] {"Isbn"});
+                    yield return errorMessage;
+                }
+                else
+                {
+                    yield return ValidationResult.Success;
+                }
             }
         }
     }
