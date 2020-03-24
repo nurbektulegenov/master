@@ -11,8 +11,6 @@ namespace BookTestProject.Controllers
 {
     public class HomeController : Controller
     {
-        BookContext db = new BookContext();
-        private ISession _session = NHibernateHelper.SessionFactory.OpenSession();
         public ActionResult Index()
         {
             return View();
@@ -32,8 +30,11 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public JsonResult GetBooksForSearch(string name)
         {
-            var books = db.Book.Select(b => b.Name.Contains(name)).ToList();
-            return Json(new { data = books }, JsonRequestBehavior.AllowGet);
+            using (ISession session = FluentNHibernateHelper.OpenSession())
+            {
+                var books = session.Query<Book>().Select(b => b.Name.Contains(name)).ToList();
+                return Json(new {data = books}, JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpGet]
@@ -48,39 +49,60 @@ namespace BookTestProject.Controllers
 
         private long GetBooksCount()
         {
-            return db.TotalCount.Select(a => a.BooksCount).First();
+            using (ISession session = FluentNHibernateHelper.OpenSession())
+            {
+                using (ITransaction transaction = session.BeginTransaction())
+                {
+                    long count = session.Query<TotalCount>().Select(a => a.BooksCount).First();
+                    transaction.Commit();
+                    return count;
+                }
+            }
         }
-        private List<BookViewModel> GetBooks(int startIndex, BookViewModel books) {
-            var booksList = db.Book.Select(b => new BookViewModel() {
-                Id = b.Id,
-                Name = b.Name,
-                AuthorName = b.Authors.UserName,
-                Isbn = b.Isbn
-            }).OrderBy(u => u.Id).Skip(startIndex).Take(books.RowsCount).ToList();
-            return booksList;
+
+        private List<BookViewModel> GetBooks(int startIndex, BookViewModel books)
+        {
+            using (ISession session = FluentNHibernateHelper.OpenSession())
+            {
+                var booksList = session.Query<Book>().Select(b => new BookViewModel()
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    AuthorName = b.Authors.UserName,
+                    Isbn = b.Isbn
+                }).OrderBy(u => u.Id).Skip(startIndex).Take(books.RowsCount).ToList();
+                return booksList;
+            }
         }
+    
 
         private SelectList GetAuthorsSelectList()
         {
-            var authorName = db.Author.Select(a => new SelectListItem()
+            using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                Value = a.Id.ToString(),
-                Text = a.UserName
-            }).ToArray();
-            var selectList = new SelectList(authorName, "Value", "Text");
-            return selectList;
+                var authorName = session.Query<Author>().Select(a => new SelectListItem()
+                {
+                    Value = a.Id.ToString(),
+                    Text = a.UserName
+                }).ToArray();
+                var selectList = new SelectList(authorName, "Value", "Text");
+                return selectList;
+            }
         }
 
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            var book = db.Book.Find(id);
-            return View(new BookViewModel
+            using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                Name = book.Name,
-                Isbn = book.Isbn,
-                Authors = GetAuthorsSelectList()
-            });
+                var book = session.Get<Book>(id);
+                return View(new BookViewModel
+                {
+                    Name = book.Name,
+                    Isbn = book.Isbn,
+                    Authors = GetAuthorsSelectList()
+                });
+            }
         }
 
         [HttpPost]
@@ -88,11 +110,18 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var bk = _session.Get<Book>(book.Id);
-                bk.Name = book.Name;
-                bk.Authors.UserName = book.AuthorName;
-                bk.Isbn = book.Isbn;
-                db.SaveChanges();
+                using (ISession session = FluentNHibernateHelper.OpenSession())
+                {
+                    var updateBook = session.Get<Book>(book.Id);
+                    updateBook.Name = book.Name;
+                    updateBook.Authors.UserName = book.AuthorName;
+                    updateBook.Isbn = book.Isbn;
+                    using (ITransaction transaction = session.BeginTransaction())
+                    {
+                        session.SaveOrUpdate(updateBook);
+                        transaction.Commit();
+                    }
+                }
                 return RedirectToAction("Index");
             }
             var authors = new BookViewModel()
@@ -105,25 +134,26 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult AddBook(BookViewModel bookViewModel)
         {
-            TotalCount count = new TotalCount();
-            if (ModelState.IsValid)
+            using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                Book book = new Book()
+                using (ITransaction transaction = session.BeginTransaction())
                 {
-                    Name = bookViewModel.Name,
-                    AuthorId = Convert.ToInt32(bookViewModel.AuthorName),
-                    Isbn = bookViewModel.Isbn
-                };
-                db.Book.Add(book);
-                long total = db.TotalCount.Select(a => a.BooksCount).First();
-                total += 1;
-                count.BooksCount = total;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-                /*return RedirectToRoutePermanent(new {
-                    Controller = "Home",
-                    Action = "Index"
-                });*/
+                    TotalCount count = new TotalCount();
+                    if (ModelState.IsValid)
+                    {
+                        Book book = new Book();
+                        book.Name = bookViewModel.Name;
+                        book.AuthorId = Convert.ToInt32(bookViewModel.AuthorName);
+                        book.Isbn = bookViewModel.Isbn;
+                        session.Save(book);
+                        
+                        long total = GetBooksCount();
+                        total += 1;
+                        count.BooksCount = total;
+                        transaction.Commit();
+                        return RedirectToAction("Index");
+                    }
+                }
             }
             var bk = new BookViewModel()
             {
@@ -135,15 +165,21 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            TotalCount count = new TotalCount();
-            Book book = db.Book.Find(id);
-            if (book != null)
+            using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                db.Book.Remove(book);
-                long total = db.TotalCount.Select(a => a.BooksCount).First();
-                total -= 1;
-                count.BooksCount = total;
-                db.SaveChanges();
+                using (ITransaction transaction = session.BeginTransaction())
+                {
+                    TotalCount count = new TotalCount();
+                    Book deleteBook = session.Get<Book>(id);
+                    if (deleteBook != null)
+                    {
+                        session.Delete(deleteBook);
+                        long total = GetBooksCount();
+                        total -= 1;
+                        count.BooksCount = total;
+                        transaction.Commit();
+                    }
+                }
             }
             return RedirectToAction("Index");
         }
