@@ -3,7 +3,7 @@ using FluentNHibernate.Mapping;
 
 namespace BookTestProject.Mapping
 {
-    public class BookMap : ClassMap<Book>
+    public class BookMap : ClassMap<Books>
     {
         public BookMap()
         {
@@ -11,7 +11,7 @@ namespace BookTestProject.Mapping
             Id(b => b.Id);
             Map(b => b.Name);
             Map(b => b.Isbn);
-            References(b => b.Authors);
+            References(b => b.Authors).Column("Author_ID").Not.Nullable();
         }
     }
 }

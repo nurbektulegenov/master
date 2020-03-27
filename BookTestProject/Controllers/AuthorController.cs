@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
-using BookTestProject.Helpers;
+using BookTestProject.Entities.Helpers;
 using BookTestProject.Models;
 using NHibernate;
 
@@ -14,7 +14,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var authors = session.Query<Author>().Select(a => new AuthorViewModel()
+                var authors = session.Query<Authors>().Select(a => new AuthorViewModel()
                 {
                     UserName = a.UserName
                 }).ToArray();
@@ -34,7 +34,7 @@ namespace BookTestProject.Controllers
             {
                 using (ISession session = FluentNHibernateHelper.OpenSession())
                 {
-                    Author author = new Author();
+                    Authors author = new Authors();
                     author.UserName = authorViewModel.UserName;
                     using (ITransaction transaction = session.BeginTransaction())
                     {
@@ -51,7 +51,7 @@ namespace BookTestProject.Controllers
         public ActionResult Edit(int id) {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var author = session.Query<Author>().Select(b => new AuthorViewModel() {
+                var author = session.Query<Authors>().Select(b => new AuthorViewModel() {
                     UserName = b.UserName
                 }).SingleOrDefault(b => b.Id == id);
                 return View(author);
@@ -67,7 +67,7 @@ namespace BookTestProject.Controllers
                 {
                     using (ITransaction transaction = session.BeginTransaction())
                     {
-                        var author = session.Get<Author>(authorViewModel.Id);
+                        var author = session.Get<Authors>(authorViewModel.Id);
                         author.UserName = authorViewModel.UserName;
                         transaction.Commit();
                     }
@@ -82,7 +82,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var count = session.Query<Book>().Where(a => a.Authors.UserName == name).ToList().Count;
+                var count = session.Query<Books>().Where(a => a.Authors.UserName == name).ToList().Count;
                 return Json(count, JsonRequestBehavior.AllowGet);
             }
         }
@@ -92,7 +92,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                Author author = session.Query<Author>().FirstOrDefault(a => a.UserName == userName);
+                Authors author = session.Query<Authors>().FirstOrDefault(a => a.UserName == userName);
                 if (author != null)
                 {
                     using (ITransaction transaction = session.BeginTransaction())

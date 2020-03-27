@@ -13,6 +13,8 @@
                     data: {  },
                     dataType: 'json',
                     success: function (response) {
+                        console.log(response);
+                        
                         done(response.data.Books);
                     },
                     error: function () {

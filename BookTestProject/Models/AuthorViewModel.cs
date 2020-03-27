@@ -3,9 +3,9 @@
 namespace BookTestProject.Models {
     public class AuthorViewModel
     {
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
         [Required(ErrorMessage = "Заполните поле")]
-        public string UserName { get; set; }
+        public virtual string UserName { get; set; }
 
     }
 }

@@ -3,7 +3,7 @@ using FluentNHibernate.Mapping;
 
 namespace BookTestProject.Mapping
 {
-    public class AuthorMap :ClassMap<Author>
+    public class AuthorMap :ClassMap<Authors>
     {
         public AuthorMap()
         {
@@ -11,8 +11,8 @@ namespace BookTestProject.Mapping
             Id(a => a.Id);
             Map(a => a.UserName);
             HasMany(a => a.Books)
-                .Inverse().
-                Cascade.All();
+                .Inverse()
+                .Cascade.All();
         }
     }
 }

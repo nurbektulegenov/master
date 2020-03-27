@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
-using BookTestProject.Helpers;
+using BookTestProject.Entities.Helpers;
 using BookTestProject.Models;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace BookTestProject.Controllers
 {
@@ -21,7 +22,7 @@ namespace BookTestProject.Controllers
         {
             BookViewModel books = new BookViewModel();
             books.RowsCount = 10000;
-            books.PagesSize = GetBooksCount();
+            //books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * books.RowsCount;
             books.Books = GetBooks(startIndex, books);
             return Json(new {data = books }, JsonRequestBehavior.AllowGet);
@@ -32,7 +33,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var books = session.Query<Book>().Select(b => b.Name.Contains(name)).ToList();
+                var books = session.Query<Books>().Select(b => b.Name.Contains(name)).ToList();
                 return Json(new {data = books}, JsonRequestBehavior.AllowGet);
             }
         }
@@ -51,12 +52,8 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                using (ITransaction transaction = session.BeginTransaction())
-                {
-                    long count = session.Query<TotalCount>().Select(a => a.BooksCount).First();
-                    transaction.Commit();
-                    return count;
-                }
+                long count = session.Query<TotalCounts>().Select(a => a.BooksCount).First();
+                return count;
             }
         }
 
@@ -64,7 +61,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var booksList = session.Query<Book>().Select(b => new BookViewModel()
+                var booksList = session.Query<Books>().Select(b => new BookViewModel()
                 {
                     Id = b.Id,
                     Name = b.Name,
@@ -80,7 +77,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var authorName = session.Query<Author>().Select(a => new SelectListItem()
+                var authorName = session.Query<Authors>().Select(a => new SelectListItem()
                 {
                     Value = a.Id.ToString(),
                     Text = a.UserName
@@ -95,7 +92,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var book = session.Get<Book>(id);
+                var book = session.Get<Books>(id);
                 return View(new BookViewModel
                 {
                     Name = book.Name,
@@ -112,7 +109,7 @@ namespace BookTestProject.Controllers
             {
                 using (ISession session = FluentNHibernateHelper.OpenSession())
                 {
-                    var updateBook = session.Get<Book>(book.Id);
+                    var updateBook = session.Get<Books>(book.Id);
                     updateBook.Name = book.Name;
                     updateBook.Authors.UserName = book.AuthorName;
                     updateBook.Isbn = book.Isbn;
@@ -138,10 +135,10 @@ namespace BookTestProject.Controllers
             {
                 using (ITransaction transaction = session.BeginTransaction())
                 {
-                    TotalCount count = new TotalCount();
+                    TotalCounts count = new TotalCounts();
                     if (ModelState.IsValid)
                     {
-                        Book book = new Book();
+                        Books book = new Books();
                         book.Name = bookViewModel.Name;
                         book.AuthorId = Convert.ToInt32(bookViewModel.AuthorName);
                         book.Isbn = bookViewModel.Isbn;
@@ -169,8 +166,8 @@ namespace BookTestProject.Controllers
             {
                 using (ITransaction transaction = session.BeginTransaction())
                 {
-                    TotalCount count = new TotalCount();
-                    Book deleteBook = session.Get<Book>(id);
+                    TotalCounts count = new TotalCounts();
+                    Books deleteBook = session.Get<Books>(id);
                     if (deleteBook != null)
                     {
                         session.Delete(deleteBook);

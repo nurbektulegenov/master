@@ -5,36 +5,36 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
-using BookTestProject.Helpers;
+using BookTestProject.Entities.Helpers;
 using NHibernate;
 
 namespace BookTestProject.Models {
     public class BookViewModel : IValidatableObject {
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
         [Required(ErrorMessage = "Заполните поле")]
         [MaxLength(50, ErrorMessage = "Имя не долно быть больше 50 символов")]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
-        public string AuthorName { get; set; }
+        public virtual string AuthorName { get; set; }
 
         [Required(ErrorMessage = "Заполните поле")]
         [Index("Ix_ProductName", Order = 1, IsUnique = true)]
         [RegularExpression("[0-9-]{1,}", ErrorMessage = "ISBN некорректно заполнен")]
-        public string Isbn { get; set; }
+        public virtual string Isbn { get; set; }
 
         public long PagesSize { get; set; }
 
         public int RowsCount { get; set; }
 
-        public List<BookViewModel> Books { get; set; }
+        public virtual List<BookViewModel> Books { get; set; }
 
-        public SelectList Authors { get; set; }
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public virtual SelectList Authors { get; set; }
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                var validateName = session.Query<Book>().FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
+                var validateName = session.Query<Books>().FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
                 if (validateName != null)
                 {
                     ValidationResult errorMessage =
