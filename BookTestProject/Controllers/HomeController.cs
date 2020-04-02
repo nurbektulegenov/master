@@ -31,7 +31,7 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public JsonResult GetBooksForSearch(string name)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var books = session.Query<Books>().Select(b => b.Name.Contains(name)).ToList();
                 return Json(new {data = books}, JsonRequestBehavior.AllowGet);
@@ -50,7 +50,7 @@ namespace BookTestProject.Controllers
 
         private long GetBooksCount()
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 long count = session.Query<TotalCounts>().Select(a => a.BooksCount).FirstOrDefault();
                 return count;
@@ -59,7 +59,7 @@ namespace BookTestProject.Controllers
 
         private List<BookViewModel> GetBooks(int startIndex, BookViewModel books)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var booksList = session.Query<Books>().Select(b => new BookViewModel()
                 {
@@ -75,7 +75,7 @@ namespace BookTestProject.Controllers
 
         private SelectList GetAuthorsSelectList()
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var model = new BookViewModel();
                 var authorName = session.Query<Authors>().Select(a => new SelectListItem()
@@ -91,7 +91,7 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var book = session.Get<Books>(id);
                 return View(new BookViewModel
@@ -108,7 +108,7 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (ISession session = FluentNHibernateHelper.OpenSession())
+                using (ISession session = NHibernateHelper.OpenSession())
                 {
                     var updateBook = session.Get<Books>(book.Id);
                     updateBook.Name = book.Name;
@@ -132,7 +132,7 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult AddBook(BookViewModel bookViewModel)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 using (ITransaction transaction = session.BeginTransaction())
                 {
@@ -163,7 +163,7 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 using (ITransaction transaction = session.BeginTransaction())
                 {

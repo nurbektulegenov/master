@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -32,9 +33,10 @@ namespace BookTestProject.Models {
         public virtual SelectList Authors { get; set; }
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var validateName = session.Query<Books>().FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
+                Console.WriteLine(validateName);
                 if (validateName != null)
                 {
                     ValidationResult errorMessage =

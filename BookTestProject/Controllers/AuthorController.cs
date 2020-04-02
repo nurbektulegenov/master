@@ -12,10 +12,11 @@ namespace BookTestProject.Controllers
         // GET
         public ActionResult Index()
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var authors = session.Query<Authors>().Select(a => new AuthorViewModel()
                 {
+                    Id=a.Id,
                     UserName = a.UserName
                 }).ToArray();
                 return View("Index", authors);
@@ -32,7 +33,7 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (ISession session = FluentNHibernateHelper.OpenSession())
+                using (ISession session = NHibernateHelper.OpenSession())
                 {
                     Authors author = new Authors();
                     author.UserName = authorViewModel.UserName;
@@ -49,12 +50,14 @@ namespace BookTestProject.Controllers
 
         [HttpGet]
         public ActionResult Edit(int id) {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
-                var author = session.Query<Authors>().Select(b => new AuthorViewModel() {
-                    UserName = b.UserName
-                }).SingleOrDefault(b => b.Id == id);
-                return View(author);
+                var author = session.Get<Authors>(id);
+                return View(new AuthorViewModel
+                {
+                    Id=author.Id,
+                    UserName = author.UserName
+                });
             }
         }
 
@@ -63,7 +66,7 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (ISession session = FluentNHibernateHelper.OpenSession())
+                using (ISession session = NHibernateHelper.OpenSession())
                 {
                     using (ITransaction transaction = session.BeginTransaction())
                     {
@@ -80,7 +83,7 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 var count = session.Query<Books>().Where(a => a.Authors.UserName == name).ToList().Count;
                 return Json(count, JsonRequestBehavior.AllowGet);
@@ -90,7 +93,7 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(string userName)
         {
-            using (ISession session = FluentNHibernateHelper.OpenSession())
+            using (ISession session = NHibernateHelper.OpenSession())
             {
                 Authors author = session.Query<Authors>().FirstOrDefault(a => a.UserName == userName);
                 if (author != null)

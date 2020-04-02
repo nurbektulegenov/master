@@ -5,8 +5,9 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace BookTestProject.Entities.Helpers
 {
-    public class FluentNHibernateHelper
+    public class NHibernateHelper
     {
+
         public static ISession OpenSession()
         {
             ISessionFactory sessionFactory = Fluently.Configure()
