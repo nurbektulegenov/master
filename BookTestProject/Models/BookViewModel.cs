@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,6 +10,7 @@ using NHibernate;
 
 namespace BookTestProject.Models {
     public class BookViewModel : IValidatableObject {
+        
         public virtual int Id { get; set; }
 
         [Required(ErrorMessage = "Заполните поле")]
@@ -24,10 +25,9 @@ namespace BookTestProject.Models {
         public virtual string Isbn { get; set; }
 
         public long PagesSize { get; set; }
-
         public int RowsCount { get; set; }
 
-        public virtual List<BookViewModel> Books { get; set; }
+        public virtual IList<BookViewModel> Books { get; set; }
 
         public virtual SelectList Authors { get; set; }
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -47,6 +47,9 @@ namespace BookTestProject.Models {
                 }
             }
         }
+        //public BookViewModel()
+        //{
+        //    Authors = new SelectList(Authors, "Value", "Text");
+        //}
     }
-
 }

@@ -52,7 +52,7 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
-                long count = session.Query<TotalCounts>().Select(a => a.BooksCount).First();
+                long count = session.Query<TotalCounts>().Select(a => a.BooksCount).FirstOrDefault();
                 return count;
             }
         }
@@ -77,13 +77,14 @@ namespace BookTestProject.Controllers
         {
             using (ISession session = FluentNHibernateHelper.OpenSession())
             {
+                var model = new BookViewModel();
                 var authorName = session.Query<Authors>().Select(a => new SelectListItem()
                 {
                     Value = a.Id.ToString(),
                     Text = a.UserName
                 }).ToArray();
-                var selectList = new SelectList(authorName, "Value", "Text");
-                return selectList;
+                model.Authors = new SelectList(authorName, "Value", "Text");
+                return model.Authors;
             }
         }
 

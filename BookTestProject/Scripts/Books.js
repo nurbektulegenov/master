@@ -63,11 +63,11 @@
                     alert("Книга удалена");
                     location.reload();
                 },
-                failure: function(response) {
-                    alert(response.responseText);
+                failure: function() {
+                    alert("Провал");
                 },
-                error: function(response) {
-                    alert(response.responseText);
+                error: function() {
+                    alert("Ошибка");
                 }
             });
         });

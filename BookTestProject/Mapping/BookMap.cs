@@ -11,7 +11,7 @@ namespace BookTestProject.Mapping
             Id(b => b.Id);
             Map(b => b.Name);
             Map(b => b.Isbn);
-            References(b => b.Authors).Column("Author_ID").Not.Nullable();
+            References(b => b.Authors).Column("AuthorId").Not.Nullable();
         }
     }
 }

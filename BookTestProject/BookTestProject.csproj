@@ -171,6 +171,7 @@
     <Compile Include="Entities\Helpers\FluentNHibernateHelper.cs" />
     <Compile Include="Mapping\AuthorMap.cs" />
     <Compile Include="Mapping\BookMap.cs" />
+    <Compile Include="Mapping\TotalCountsMap.cs" />
     <Compile Include="Models\AuthorViewModel.cs" />
     <Compile Include="Models\BookViewModel.cs" />
     <Compile Include="Models\DataViewModel.cs" />

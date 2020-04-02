@@ -14,6 +14,7 @@ namespace BookTestProject.Entities.Helpers
                 )
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Books>())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Authors>())
+                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<TotalCounts>())
                 .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(false, true))
                 .BuildSessionFactory();
             return sessionFactory.OpenSession();
