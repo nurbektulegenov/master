@@ -33,9 +33,9 @@ namespace BookTestProject.Models {
         public virtual SelectList Authors { get; set; }
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
-                var validateName = session.Query<Books>().FirstOrDefault(x => x.Isbn == Isbn && x.Id != Id);
+                var validateName = session.Query<Books>().FirstOrDefault(x => x.Isbn == Isbn);
                 Console.WriteLine(validateName);
                 if (validateName != null)
                 {

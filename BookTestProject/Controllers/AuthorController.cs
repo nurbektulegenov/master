@@ -1,22 +1,24 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
-using BookTestProject.Entities.Helpers;
+using BookTestProject.Interfaces;
 using BookTestProject.Models;
+using BookTestProject.Repository;
 using NHibernate;
 
 namespace BookTestProject.Controllers
 {
     public class AuthorController : Controller
     {
-        // GET
+        IGenericRepository<Authors> authorRep = new GenericRepository<Authors>(null);
+
         public ActionResult Index()
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
                 var authors = session.Query<Authors>().Select(a => new AuthorViewModel()
                 {
-                    Id=a.Id,
+                    Id = a.Id,
                     UserName = a.UserName
                 }).ToArray();
                 return View("Index", authors);
@@ -33,32 +35,23 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (ISession session = NHibernateHelper.OpenSession())
-                {
-                    Authors author = new Authors();
-                    author.UserName = authorViewModel.UserName;
-                    using (ITransaction transaction = session.BeginTransaction())
-                    {
-                        session.Save(author);
-                        transaction.Commit();
-                    }
-                    return RedirectToAction("Index");
-                }
+                Authors author = new Authors();
+                author.UserName = authorViewModel.UserName;
+                authorRep.Add(author);
+                return RedirectToAction("Index");
             }
             return View();
         }
 
         [HttpGet]
-        public ActionResult Edit(int id) {
-            using (ISession session = NHibernateHelper.OpenSession())
+        public ActionResult Edit(int id)
+        {
+            var author = authorRep.GetById(id);
+            return View(new AuthorViewModel
             {
-                var author = session.Get<Authors>(id);
-                return View(new AuthorViewModel
-                {
-                    Id=author.Id,
-                    UserName = author.UserName
-                });
-            }
+                Id = author.Id,
+                UserName = author.UserName
+            });
         }
 
         [HttpPost]
@@ -66,15 +59,9 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (ISession session = NHibernateHelper.OpenSession())
-                {
-                    using (ITransaction transaction = session.BeginTransaction())
-                    {
-                        var author = session.Get<Authors>(authorViewModel.Id);
-                        author.UserName = authorViewModel.UserName;
-                        transaction.Commit();
-                    }
-                }
+                var author = authorRep.GetById(authorViewModel.Id);
+                author.UserName = authorViewModel.UserName;
+                authorRep.Update(author);
                 return RedirectToAction("Index");
             }
             return View("Edit", authorViewModel);
@@ -83,7 +70,7 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
                 var count = session.Query<Books>().Where(a => a.Authors.UserName == name).ToList().Count;
                 return Json(count, JsonRequestBehavior.AllowGet);
@@ -93,20 +80,17 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(string userName)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
                 Authors author = session.Query<Authors>().FirstOrDefault(a => a.UserName == userName);
                 if (author != null)
                 {
-                    using (ITransaction transaction = session.BeginTransaction())
-                    {
-                        session.Delete(author);
-                        transaction.Commit();
-                    }
+                    authorRep.Delete(author.Id);
                     return RedirectToAction("Index");
                 }
+
+                return Json(HttpNotFound());
             }
-            return Json(HttpNotFound());
         }
     }
 }

@@ -5,7 +5,7 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace BookTestProject.Entities.Helpers
 {
-    public class NHibernateHelper
+    public class NHibernateHelper1
     {
 
         public static ISession OpenSession()

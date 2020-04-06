@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
-using BookTestProject.Entities.Helpers;
+using BookTestProject.Interfaces;
 using BookTestProject.Models;
+using BookTestProject.Repository;
 using NHibernate;
-using NHibernate.Linq;
 
 namespace BookTestProject.Controllers
 {
     public class HomeController : Controller
     {
+        IGenericRepository<Books> bookRepository = new GenericRepository<Books>(null);
         public ActionResult Index()
         {
             return View();
@@ -31,7 +32,7 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public JsonResult GetBooksForSearch(string name)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
                 var books = session.Query<Books>().Select(b => b.Name.Contains(name)).ToList();
                 return Json(new {data = books}, JsonRequestBehavior.AllowGet);
@@ -48,18 +49,9 @@ namespace BookTestProject.Controllers
             return View(model);
         }
 
-        private long GetBooksCount()
-        {
-            using (ISession session = NHibernateHelper.OpenSession())
-            {
-                long count = session.Query<TotalCounts>().Select(a => a.BooksCount).FirstOrDefault();
-                return count;
-            }
-        }
-
         private List<BookViewModel> GetBooks(int startIndex, BookViewModel books)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
                 var booksList = session.Query<Books>().Select(b => new BookViewModel()
                 {
@@ -71,11 +63,11 @@ namespace BookTestProject.Controllers
                 return booksList;
             }
         }
-    
+
 
         private SelectList GetAuthorsSelectList()
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            using (ISession session = UnitOfWork.OpenSession())
             {
                 var model = new BookViewModel();
                 var authorName = session.Query<Authors>().Select(a => new SelectListItem()
@@ -91,16 +83,13 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            var book = bookRepository.GetById(id);
+            return View(new BookViewModel
             {
-                var book = session.Get<Books>(id);
-                return View(new BookViewModel
-                {
-                    Name = book.Name,
-                    Isbn = book.Isbn,
-                    Authors = GetAuthorsSelectList()
-                });
-            }
+                Name = book.Name,
+                Isbn = book.Isbn,
+                Authors = GetAuthorsSelectList()
+            });
         }
 
         [HttpPost]
@@ -108,18 +97,11 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (ISession session = NHibernateHelper.OpenSession())
-                {
-                    var updateBook = session.Get<Books>(book.Id);
-                    updateBook.Name = book.Name;
-                    updateBook.Authors.UserName = book.AuthorName;
-                    updateBook.Isbn = book.Isbn;
-                    using (ITransaction transaction = session.BeginTransaction())
-                    {
-                        session.SaveOrUpdate(updateBook);
-                        transaction.Commit();
-                    }
-                }
+                var updateBook = bookRepository.GetById(book.Id);
+                updateBook.Name = book.Name;
+                updateBook.Authors.UserName = book.AuthorName;
+                updateBook.Isbn = book.Isbn;
+                bookRepository.Add(updateBook);
                 return RedirectToAction("Index");
             }
             var authors = new BookViewModel()
@@ -132,27 +114,25 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult AddBook(BookViewModel bookViewModel)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
+            TotalCounts count = new TotalCounts();
+            if (ModelState.IsValid)
             {
-                using (ITransaction transaction = session.BeginTransaction())
+                Books book = new Books();
+                book.Name = bookViewModel.Name;
+                book.Authors = new Authors {Id = book.AuthorId};
+                book.Isbn = bookViewModel.Isbn;
+                bookRepository.Add(book);
+
+                long total = bookRepository.GetBooksCount();
+                using (ITransaction transaction = UnitOfWork.OpenSession().BeginTransaction())
                 {
-                    TotalCounts count = new TotalCounts();
-                    if (ModelState.IsValid)
-                    {
-                        Books book = new Books();
-                        book.Name = bookViewModel.Name;
-                        book.AuthorId = Convert.ToInt32(bookViewModel.AuthorName);
-                        book.Isbn = bookViewModel.Isbn;
-                        session.Save(book);
-                        
-                        long total = GetBooksCount();
-                        total += 1;
-                        count.BooksCount = total;
-                        transaction.Commit();
-                        return RedirectToAction("Index");
-                    }
+                    total += 1;
+                    count.BooksCount = total;
+                    transaction.Commit();
                 }
+                return RedirectToAction("Index");
             }
+
             var bk = new BookViewModel()
             {
                 Authors = GetAuthorsSelectList()
@@ -163,22 +143,11 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            using (ISession session = NHibernateHelper.OpenSession())
-            {
-                using (ITransaction transaction = session.BeginTransaction())
-                {
-                    TotalCounts count = new TotalCounts();
-                    Books deleteBook = session.Get<Books>(id);
-                    if (deleteBook != null)
-                    {
-                        session.Delete(deleteBook);
-                        long total = GetBooksCount();
-                        total -= 1;
-                        count.BooksCount = total;
-                        transaction.Commit();
-                    }
-                }
-            }
+            TotalCounts count = new TotalCounts();
+            bookRepository.Delete(id);
+            long total = bookRepository.GetBooksCount();
+            total -= 1;
+            count.BooksCount = total;
             return RedirectToAction("Index");
         }
     }
