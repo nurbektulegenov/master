@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web.Mvc;
 using BookTestProject.Entities;
-using BookTestProject.Entities.Helpers;
 using NHibernate;
 
 namespace BookTestProject.Models {
@@ -35,7 +33,7 @@ namespace BookTestProject.Models {
         {
             using (ISession session = UnitOfWork.OpenSession())
             {
-                var validateName = session.Query<Books>().FirstOrDefault(x => x.Isbn == Isbn);
+                var validateName = session.Query<Books>().FirstOrDefault(x => x.Isbn == Isbn && x.Authors.UserName == AuthorName);
                 Console.WriteLine(validateName);
                 if (validateName != null)
                 {
@@ -49,9 +47,5 @@ namespace BookTestProject.Models {
                 }
             }
         }
-        //public BookViewModel()
-        //{
-        //    Authors = new SelectList(Authors, "Value", "Text");
-        //}
     }
 }

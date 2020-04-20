@@ -13,6 +13,7 @@ namespace BookTestProject.Controllers
     public class HomeController : Controller
     {
         IGenericRepository<Books> bookRepository = new GenericRepository<Books>(null);
+        IGenericRepository<Authors> authorRepository = new GenericRepository<Authors>(null);
         public ActionResult Index()
         {
             return View();
@@ -114,12 +115,13 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult AddBook(BookViewModel bookViewModel)
         {
+            int value = Convert.ToInt32(bookViewModel.AuthorName);
             TotalCounts count = new TotalCounts();
             if (ModelState.IsValid)
             {
                 Books book = new Books();
                 book.Name = bookViewModel.Name;
-                book.Authors = new Authors {Id = book.AuthorId};
+                book.Authors.Id = authorRepository.GetById(value).Id;
                 book.Isbn = bookViewModel.Isbn;
                 bookRepository.Add(book);
 
@@ -132,12 +134,11 @@ namespace BookTestProject.Controllers
                 }
                 return RedirectToAction("Index");
             }
-
-            var bk = new BookViewModel()
+            var model = new BookViewModel()
             {
                 Authors = GetAuthorsSelectList()
             };
-            return View(bk);
+            return View(model);
         }
 
         [HttpPost]

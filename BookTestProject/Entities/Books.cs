@@ -9,5 +9,10 @@
         public virtual Authors Authors { get; set; }
 
         public virtual string Isbn { get; set; }
+
+        public Books()
+        {
+            Authors = new Authors();
+        }
     }
 }

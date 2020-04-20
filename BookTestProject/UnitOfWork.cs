@@ -50,7 +50,7 @@ namespace BookTestProject
         public static ISession OpenSession()
         {
             ISessionFactory sessionFactory = Fluently.Configure()
-                .Database(MsSqlConfiguration.MsSql2008.ConnectionString(@"data source=(localdb)\MSSQLLocalDB;Initial Catalog=Books_test;Integrated Security=True;").ShowSql()
+                .Database(MsSqlConfiguration.MsSql2008.ConnectionString(@"Data Source=LENOVO-Y5070; Initial Catalog=Books_test;Integrated Security=True;").ShowSql()
                 )
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Books>())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Authors>())
