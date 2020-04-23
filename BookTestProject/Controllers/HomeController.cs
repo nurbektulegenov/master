@@ -6,15 +6,18 @@ using BookTestProject.Entities;
 using BookTestProject.Interfaces;
 using BookTestProject.Models;
 using BookTestProject.Repository;
+using NHibernate;
 
 namespace BookTestProject.Controllers
 {
     public class HomeController : Controller
     {
-        private IRepository entity;
+        private IGenericRepository<Books> bookRepository;
+        private IGenericRepository<Authors> authorRepository;
         public HomeController()
         {
-            entity = new EntityFrameworkRepository();
+            bookRepository=new GenericRepository<Books>(null);
+            authorRepository=new GenericRepository<Authors>(null);
         }
         public ActionResult Index()
         {
@@ -26,10 +29,17 @@ namespace BookTestProject.Controllers
         {
             BookViewModel books = new BookViewModel();
             books.RowsCount = 10000;
-            books.PagesSize = entity.GetBooksCount();
+            //books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * books.RowsCount;
             books.Books = entity.GetBooksList(startIndex, books);
             return Json(new {data = books }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetBooksForSearch(string name)
+        {
+            var books = bookRepository.Select(b => b.Name.Contains(name)).ToList();
+            return Json(new {data = books}, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -42,10 +52,35 @@ namespace BookTestProject.Controllers
             return View(model);
         }
 
+        private List<BookViewModel> GetBooks(int startIndex, BookViewModel books)
+        {
+            var booksList = bookRepository.SelectBooks(b => new BookViewModel()
+            {
+                Id = b.Id,
+                Name = b.Name,
+                AuthorName = b.Authors.UserName,
+                Isbn = b.Isbn
+            }, u=>u.Id, startIndex, books.RowsCount);
+            return booksList;
+        }
+
+
+        private SelectList GetAuthorsSelectList()
+        {
+            var model = new BookViewModel();
+            var authorName = authorRepository.Select(a => new SelectListItem()
+            {
+                Value = a.Id.ToString(),
+                Text = a.UserName
+            }).ToArray();
+            model.Authors = new SelectList(authorName, "Value", "Text");
+            return model.Authors;
+        }
+
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            var book = entity.GetBook(id);
+            var book = bookRepository.GetById(id);
             return View(new BookViewModel
             {
                 Name = book.Name,
@@ -59,11 +94,11 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var oldBook = entity.GetBook(book.Id);
-                oldBook.Name = book.Name;
-                oldBook.Authors.UserName = book.AuthorName;
-                oldBook.Isbn = book.Isbn;
-                entity.Save();
+                var updateBook = bookRepository.GetById(book.Id);
+                updateBook.Name = book.Name;
+                updateBook.Authors.UserName = book.AuthorName;
+                updateBook.Isbn = book.Isbn;
+                bookRepository.Add(updateBook);
                 return RedirectToAction("Index");
             }
             var authors = new BookViewModel()
@@ -76,24 +111,30 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult AddBook(BookViewModel bookViewModel)
         {
+            int value = Convert.ToInt32(bookViewModel.AuthorName);
+            TotalCounts count = new TotalCounts();
             if (ModelState.IsValid)
             {
-                Book book = new Book()
+                Books book = new Books();
+                book.Name = bookViewModel.Name;
+                book.Authors.Id = authorRepository.GetById(value).Id;
+                book.Isbn = bookViewModel.Isbn;
+                bookRepository.Add(book);
+
+                long total = bookRepository.GetBooksCount();
+                using (ITransaction transaction = UnitOfWork.OpenSession().BeginTransaction())
                 {
-                    Name = bookViewModel.Name,
-                    AuthorId = Convert.ToInt32(bookViewModel.AuthorName),
-                    Isbn = bookViewModel.Isbn
-                };
-                entity.CreateBook(book);
-                ChangeBooksCount("add");
-                entity.Save();
+                    total += 1;
+                    count.BooksCount = total;
+                    transaction.Commit();
+                }
                 return RedirectToAction("Index");
             }
-            var bk = new BookViewModel()
+            var model = new BookViewModel()
             {
                 Authors = entity.GetAuthorsSelectList()
             };
-            return View(bk);
+            return View(model);
         }
 
         private long ChangeBooksCount(string mode)
@@ -108,9 +149,11 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            entity.DeleteBook(id);
-            ChangeBooksCount("delete");
-            entity.Save();
+            TotalCounts count = new TotalCounts();
+            bookRepository.Delete(id);
+            long total = bookRepository.GetBooksCount();
+            total -= 1;
+            count.BooksCount = total;
             return RedirectToAction("Index");
         }
     }

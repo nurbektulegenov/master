@@ -20,7 +20,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.AuthorName, "Автор")
                     <br />
-                    @Html.DropDownListFor(m=>m.Authors, Model.Authors)
+                    @Html.DropDownListFor(m=>m.Authors, Model.Authors, "Выберите автора")
                     <br />
                     @Html.ValidationMessageFor(model => model.AuthorName)
                 </div>

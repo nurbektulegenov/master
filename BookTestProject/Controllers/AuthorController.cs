@@ -1,29 +1,28 @@
-﻿using System.Data.Entity;
-using System.Linq;
-using System.Web.Mvc;
-using BookTestProject.Entities;
+﻿using BookTestProject.Entities;
 using BookTestProject.Interfaces;
 using BookTestProject.Models;
 using BookTestProject.Repository;
+using System.Web.Mvc;
 
 namespace BookTestProject.Controllers
 {
     public class AuthorController : Controller
     {
-        private IRepository entity;
-        public AuthorController()
-        {
-            entity = new EntityFrameworkRepository();
-        }
-        // GET
+        IGenericRepository<Authors> authorRep = new GenericRepository<Authors>(null);
+
         public ActionResult Index()
         {
-            var authors = entity.GetAuthorsList();
+            var authors = authorRep.Select(a => new AuthorViewModel()
+            {
+                Id = a.Id,
+                UserName = a.UserName
+            }).ToArray();
             return View("Index", authors);
         }
 
         [HttpGet]
-        public ViewResult AddAuthor() {
+        public ViewResult AddAuthor()
+        {
             return View();
         }
 
@@ -32,12 +31,9 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                Author author = new Author()
-                {
-                    UserName = authorViewModel.UserName
-                };
-                entity.CreateAuthor(author);
-                entity.Save();
+                Authors author = new Authors();
+                author.UserName = authorViewModel.UserName;
+                authorRep.Add(author);
                 return RedirectToAction("Index");
             }
             return View();
@@ -46,8 +42,12 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            var author = entity.GetAuthorForEdit(id);
-            return View(author);
+            var author = authorRep.GetById(id);
+            return View(new AuthorViewModel
+            {
+                Id = author.Id,
+                UserName = author.UserName
+            });
         }
 
         [HttpPost]
@@ -55,9 +55,9 @@ namespace BookTestProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var author = entity.GetAuthor(authorViewModel.Id);
+                var author = authorRep.GetById(authorViewModel.Id);
                 author.UserName = authorViewModel.UserName;
-                entity.Save();
+                authorRep.Update(author);
                 return RedirectToAction("Index");
             }
             return View("Edit", authorViewModel);
@@ -66,16 +66,21 @@ namespace BookTestProject.Controllers
         /*[HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
-            var count = db.Book.Where(a => a.Authors.UserName == name).ToList().Count;
+            var count = authorRep.Where(a => a.UserName == name).Count;
             return Json(count, JsonRequestBehavior.AllowGet);
         }*/
 
         [HttpPost]
         public ActionResult Delete(string userName)
         {
-            entity.DeleteAuthor(userName);
-            entity.Save();
-            return RedirectToAction("Index");
+            Authors author = authorRep.Find(a => a.UserName == userName);
+            if (author != null)
+            {
+                authorRep.Delete(author.Id);
+                return RedirectToAction("Index");
+            }
+
+            return Json(HttpNotFound());
         }
     }
 }
