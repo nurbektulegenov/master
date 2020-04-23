@@ -12,8 +12,13 @@ namespace BookTestProject.Controllers
 {
     public class HomeController : Controller
     {
-        IGenericRepository<Books> bookRepository = new GenericRepository<Books>(null);
-        IGenericRepository<Authors> authorRepository = new GenericRepository<Authors>(null);
+        private IGenericRepository<Books> bookRepository;
+        private IGenericRepository<Authors> authorRepository;
+        public HomeController()
+        {
+            bookRepository=new GenericRepository<Books>(null);
+            authorRepository=new GenericRepository<Authors>(null);
+        }
         public ActionResult Index()
         {
             return View();
@@ -33,11 +38,8 @@ namespace BookTestProject.Controllers
         [HttpPost]
         public JsonResult GetBooksForSearch(string name)
         {
-            using (ISession session = UnitOfWork.OpenSession())
-            {
-                var books = session.Query<Books>().Select(b => b.Name.Contains(name)).ToList();
-                return Json(new {data = books}, JsonRequestBehavior.AllowGet);
-            }
+            var books = bookRepository.Select(b => b.Name.Contains(name)).ToList();
+            return Json(new {data = books}, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -52,33 +54,27 @@ namespace BookTestProject.Controllers
 
         private List<BookViewModel> GetBooks(int startIndex, BookViewModel books)
         {
-            using (ISession session = UnitOfWork.OpenSession())
+            var booksList = bookRepository.Select(b => new BookViewModel()
             {
-                var booksList = session.Query<Books>().Select(b => new BookViewModel()
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    AuthorName = b.Authors.UserName,
-                    Isbn = b.Isbn
-                }).OrderBy(u => u.Id).Skip(startIndex).Take(books.RowsCount).ToList();
-                return booksList;
-            }
+                Id = b.Id,
+                Name = b.Name,
+                AuthorName = b.Authors.UserName,
+                Isbn = b.Isbn
+            }).OrderBy(u => u.Id).Skip(startIndex).Take(books.RowsCount).ToList();
+            return booksList;
         }
 
 
         private SelectList GetAuthorsSelectList()
         {
-            using (ISession session = UnitOfWork.OpenSession())
+            var model = new BookViewModel();
+            var authorName = authorRepository.Select(a => new SelectListItem()
             {
-                var model = new BookViewModel();
-                var authorName = session.Query<Authors>().Select(a => new SelectListItem()
-                {
-                    Value = a.Id.ToString(),
-                    Text = a.UserName
-                }).ToArray();
-                model.Authors = new SelectList(authorName, "Value", "Text");
-                return model.Authors;
-            }
+                Value = a.Id.ToString(),
+                Text = a.UserName
+            }).ToArray();
+            model.Authors = new SelectList(authorName, "Value", "Text");
+            return model.Authors;
         }
 
         [HttpGet]

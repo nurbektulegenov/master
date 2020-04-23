@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using BookTestProject.Entities;
+﻿using BookTestProject.Entities;
 using BookTestProject.Interfaces;
 using BookTestProject.Models;
 using BookTestProject.Repository;
-using NHibernate;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace BookTestProject.Controllers
 {
@@ -14,19 +13,17 @@ namespace BookTestProject.Controllers
 
         public ActionResult Index()
         {
-            using (ISession session = UnitOfWork.OpenSession())
+            var authors = authorRep.Select(a => new AuthorViewModel()
             {
-                var authors = session.Query<Authors>().Select(a => new AuthorViewModel()
-                {
-                    Id = a.Id,
-                    UserName = a.UserName
-                }).ToArray();
-                return View("Index", authors);
-            }
+                Id = a.Id,
+                UserName = a.UserName
+            }).ToArray();
+            return View("Index", authors);
         }
 
         [HttpGet]
-        public ViewResult AddAuthor() {
+        public ViewResult AddAuthor()
+        {
             return View();
         }
 
@@ -70,27 +67,21 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
-            using (ISession session = UnitOfWork.OpenSession())
-            {
-                var count = session.Query<Books>().Where(a => a.Authors.UserName == name).ToList().Count;
-                return Json(count, JsonRequestBehavior.AllowGet);
-            }
+            var count = authorRep.Where(a => a.UserName == name).ToList().Count;
+            return Json(count, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public ActionResult Delete(string userName)
         {
-            using (ISession session = UnitOfWork.OpenSession())
+            Authors author = authorRep.Find(a => a.UserName == userName);
+            if (author != null)
             {
-                Authors author = session.Query<Authors>().FirstOrDefault(a => a.UserName == userName);
-                if (author != null)
-                {
-                    authorRep.Delete(author.Id);
-                    return RedirectToAction("Index");
-                }
-
-                return Json(HttpNotFound());
+                authorRep.Delete(author.Id);
+                return RedirectToAction("Index");
             }
+
+            return Json(HttpNotFound());
         }
     }
 }

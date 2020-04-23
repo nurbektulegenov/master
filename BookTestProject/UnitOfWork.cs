@@ -1,11 +1,10 @@
-﻿using System;
-using System.Data;
-using BookTestProject.Entities;
+﻿using BookTestProject.Entities;
 using BookTestProject.Interfaces;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
+using System;
 
 namespace BookTestProject
 {
@@ -20,7 +19,7 @@ namespace BookTestProject
             _sessionFactory = sessionFactory;
             Session = _sessionFactory.OpenSession();
             Session.FlushMode = FlushMode.Auto;
-            _transaction = Session.BeginTransaction(IsolationLevel.ReadCommitted);
+            _transaction = Session.BeginTransaction();
         }
 
         public void Dispose()
@@ -28,6 +27,7 @@ namespace BookTestProject
             if (Session.IsOpen)
             {
                 Session.Close();
+                Session = null;
             }
         }
 
@@ -55,7 +55,7 @@ namespace BookTestProject
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Books>())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Authors>())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<TotalCounts>())
-                .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(false, true))
+                .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(true, true))
                 .BuildSessionFactory();
             return sessionFactory.OpenSession();
         }

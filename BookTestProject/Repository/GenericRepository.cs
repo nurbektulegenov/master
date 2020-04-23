@@ -1,23 +1,19 @@
-﻿using System;
-using System.Data.Entity;
-using System.Linq;
-using System.Linq.Expressions;
-using BookTestProject.Entities;
+﻿using BookTestProject.Entities;
 using BookTestProject.Interfaces;
 using NHibernate;
-using NHibernate.Criterion;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace BookTestProject.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly IUnitOfWork _unitOfWork;
-        internal DbSet<T> dbSet;
+        private readonly ISession _session;
 
-        public GenericRepository(IUnitOfWork unitOfWork)
+        public GenericRepository(ISession session)
         {
-            _unitOfWork = unitOfWork;
-
+            _session = session;
         }
 
         public virtual void Add(T entity)
@@ -64,12 +60,24 @@ namespace BookTestProject.Repository
             }
         }
 
-        public IQueryOver<T> Select(Expression<Func<T, object>> exp)
+        public IQueryable<TRes> Select<TRes>(Expression<Func<T, TRes>> expression)
         {
             using (ISession session = UnitOfWork.OpenSession())
             {
-                return session.QueryOver<T>().Select(Projections.Group<T>(exp));
+                return session.Query<T>().Select(expression);
             }
+        }
+
+        public IQueryable<T> Where(Expression<Func<T, bool>> expression)
+        {
+            using (ISession session = UnitOfWork.OpenSession())
+            {
+                return session.Query<T>().Where(expression);
+            }
+        }
+        public T Find(Expression<Func<T, bool>> expression)
+        {
+            return Where(expression).FirstOrDefault();
         }
 
         public T Load(int id)
