@@ -2,7 +2,6 @@
 using BookTestProject.Interfaces;
 using BookTestProject.Models;
 using BookTestProject.Repository;
-using System.Linq;
 using System.Web.Mvc;
 
 namespace BookTestProject.Controllers
@@ -67,7 +66,7 @@ namespace BookTestProject.Controllers
         [HttpGet]
         public JsonResult BooksToAuthors(string name)
         {
-            var count = authorRep.Where(a => a.UserName == name).ToList().Count;
+            var count = authorRep.Where(a => a.UserName == name).Count;
             return Json(count, JsonRequestBehavior.AllowGet);
         }
 

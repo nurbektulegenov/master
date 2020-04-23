@@ -2,6 +2,7 @@
 using BookTestProject.Interfaces;
 using NHibernate;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -60,19 +61,27 @@ namespace BookTestProject.Repository
             }
         }
 
-        public IQueryable<TRes> Select<TRes>(Expression<Func<T, TRes>> expression)
+        public List<TRes> Select<TRes>(Expression<Func<T, TRes>> expression)
         {
             using (ISession session = UnitOfWork.OpenSession())
             {
-                return session.Query<T>().Select(expression);
+                return session.Query<T>().Select(expression).ToList();
             }
         }
 
-        public IQueryable<T> Where(Expression<Func<T, bool>> expression)
+        public List<TRes> SelectBooks<TRes>(Expression<Func<T, TRes>> expression, Expression<Func<TRes, int>> orderExp, int skip, int take)
         {
             using (ISession session = UnitOfWork.OpenSession())
             {
-                return session.Query<T>().Where(expression);
+                return session.Query<T>().Select(expression).OrderBy(orderExp).Skip(skip).Take(take).ToList();
+            }
+        }
+
+        public List<T> Where(Expression<Func<T, bool>> expression)
+        {
+            using (ISession session = UnitOfWork.OpenSession())
+            {
+                return session.Query<T>().Where(expression).ToList();
             }
         }
         public T Find(Expression<Func<T, bool>> expression)

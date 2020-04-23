@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -8,8 +9,9 @@ namespace BookTestProject.Interfaces
     {
         T GetById(int id);
         T Load(int id);
-        IQueryable<TRes> Select<TRes>(Expression<Func<T, TRes>> exp);
-        IQueryable<T> Where(Expression<Func<T, bool>> exp);
+        List<TRes> Select<TRes>(Expression<Func<T, TRes>> exp);
+        List<TRes> SelectBooks<TRes>(Expression<Func<T, TRes>> exp, Expression<Func<TRes, int>> orderExp, int skip, int take);
+        List<T> Where(Expression<Func<T, bool>> exp);
         T Find(Expression<Func<T, bool>> exp);
         void Add(T entity);
         void Delete(int id);

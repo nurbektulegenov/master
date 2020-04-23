@@ -54,13 +54,13 @@ namespace BookTestProject.Controllers
 
         private List<BookViewModel> GetBooks(int startIndex, BookViewModel books)
         {
-            var booksList = bookRepository.Select(b => new BookViewModel()
+            var booksList = bookRepository.SelectBooks(b => new BookViewModel()
             {
                 Id = b.Id,
                 Name = b.Name,
                 AuthorName = b.Authors.UserName,
                 Isbn = b.Isbn
-            }).OrderBy(u => u.Id).Skip(startIndex).Take(books.RowsCount).ToList();
+            }, u=>u.Id, startIndex, books.RowsCount);
             return booksList;
         }
 
