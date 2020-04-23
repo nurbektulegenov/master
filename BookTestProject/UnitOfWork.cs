@@ -5,6 +5,7 @@ using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using System;
+using System.Configuration;
 
 namespace BookTestProject
 {
@@ -50,8 +51,7 @@ namespace BookTestProject
         public static ISession OpenSession()
         {
             ISessionFactory sessionFactory = Fluently.Configure()
-                .Database(MsSqlConfiguration.MsSql2008.ConnectionString(@"Data Source=LENOVO-Y5070; Initial Catalog=Books_test;Integrated Security=True;").ShowSql()
-                )
+                .Database(MsSqlConfiguration.MsSql2008.ConnectionString(ConfigurationManager.ConnectionStrings["DBConnection"].ConnectionString).ShowSql())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Books>())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Authors>())
                 .Mappings(m => m.FluentMappings.AddFromAssemblyOf<TotalCounts>())
