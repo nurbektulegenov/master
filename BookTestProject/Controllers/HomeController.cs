@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using BookTestProject.Entities;
+﻿using BookTestProject.Entities;
 using BookTestProject.Interfaces;
 using BookTestProject.Models;
 using BookTestProject.Repository;
 using NHibernate;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace BookTestProject.Controllers
 {
@@ -14,10 +14,12 @@ namespace BookTestProject.Controllers
     {
         private IGenericRepository<Books> bookRepository;
         private IGenericRepository<Authors> authorRepository;
+        private IUnitOfWork _unitOfWork;
         public HomeController()
         {
-            bookRepository=new GenericRepository<Books>(null);
-            authorRepository=new GenericRepository<Authors>(null);
+            bookRepository = new GenericRepository<Books>(null);
+            authorRepository = new GenericRepository<Authors>(null);
+            _unitOfWork = new UnitOfWork(null);
         }
         public ActionResult Index()
         {
@@ -31,15 +33,15 @@ namespace BookTestProject.Controllers
             books.RowsCount = 10000;
             //books.PagesSize = GetBooksCount();
             int startIndex = (pageIndex - 1) * books.RowsCount;
-            books.Books = entity.GetBooksList(startIndex, books);
-            return Json(new {data = books }, JsonRequestBehavior.AllowGet);
+            books.Books = GetBooks(startIndex, books);
+            return Json(new { data = books }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public JsonResult GetBooksForSearch(string name)
         {
             var books = bookRepository.Select(b => b.Name.Contains(name)).ToList();
-            return Json(new {data = books}, JsonRequestBehavior.AllowGet);
+            return Json(new { data = books }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -47,7 +49,7 @@ namespace BookTestProject.Controllers
         {
             var model = new BookViewModel()
             {
-                Authors = entity.GetAuthorsSelectList()
+                Authors = GetAuthorsSelectList()
             };
             return View(model);
         }
@@ -60,7 +62,7 @@ namespace BookTestProject.Controllers
                 Name = b.Name,
                 AuthorName = b.Authors.UserName,
                 Isbn = b.Isbn
-            }, u=>u.Id, startIndex, books.RowsCount);
+            }, u => u.Id, startIndex, books.RowsCount);
             return booksList;
         }
 
@@ -85,7 +87,7 @@ namespace BookTestProject.Controllers
             {
                 Name = book.Name,
                 Isbn = book.Isbn,
-                Authors = entity.GetAuthorsSelectList()
+                Authors = GetAuthorsSelectList()
             });
         }
 
@@ -103,7 +105,7 @@ namespace BookTestProject.Controllers
             }
             var authors = new BookViewModel()
             {
-                Authors = entity.GetAuthorsSelectList()
+                Authors = GetAuthorsSelectList()
             };
             return View("Edit", authors);
         }
@@ -132,25 +134,17 @@ namespace BookTestProject.Controllers
             }
             var model = new BookViewModel()
             {
-                Authors = entity.GetAuthorsSelectList()
+                Authors = GetAuthorsSelectList()
             };
             return View(model);
-        }
-
-        private long ChangeBooksCount(string mode)
-        {
-            TotalCount count = new TotalCount();
-            long total = entity.GetBooksCount();
-            if(mode=="add") total += 1;
-            if(mode=="delete")total -= 1;
-            return count.BooksCount = total;
         }
 
         [HttpPost]
         public ActionResult Delete(int id)
         {
             TotalCounts count = new TotalCounts();
-            bookRepository.Delete(id);
+            var book =  bookRepository.GetById(id);
+            bookRepository.SoftDelete(book);
             long total = bookRepository.GetBooksCount();
             total -= 1;
             count.BooksCount = total;

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using BookTestProject.Models;
+using NHibernate.Criterion;
 
 namespace BookTestProject.Repository
 {
@@ -102,6 +104,18 @@ namespace BookTestProject.Repository
             using (ISession session = UnitOfWork.OpenSession())
             {
                 return session.Query<TotalCounts>().Select(a => a.BooksCount).FirstOrDefault();
+            }
+        }
+        public void SoftDelete(Books book)
+        {
+            using (ISession session = UnitOfWork.OpenSession())
+            {
+                using (ITransaction transaction = session.BeginTransaction())
+                {
+                    book.IsDeleted = true;
+                    session.Update(book);
+                    transaction.Commit();
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
+using BookTestProject.Entities;
 
 namespace BookTestProject.Interfaces
 {
@@ -17,5 +17,6 @@ namespace BookTestProject.Interfaces
         void Delete(int id);
         void Update(T entity);
         long GetBooksCount();
+        void SoftDelete(Books book);
     }
 }

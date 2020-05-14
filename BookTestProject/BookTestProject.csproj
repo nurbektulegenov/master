@@ -162,13 +162,13 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AuthorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Entities\Helpers\NHibernateHelper.cs" />
     <Compile Include="Entities\TotalCounts.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Entities\Authors.cs" />
     <Compile Include="Entities\Books.cs" />
+    <Compile Include="Interfaces\ISoftDeletable.cs" />
     <Compile Include="Mapping\AuthorMap.cs" />
     <Compile Include="Mapping\BookMap.cs" />
     <Compile Include="Mapping\TotalCountsMap.cs" />
@@ -179,6 +179,7 @@
     <Compile Include="Interfaces\IGenericRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
     <Compile Include="Repository\GenericRepository.cs" />
+    <Compile Include="SoftDeleteEventListener.cs" />
     <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -195,9 +196,6 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <EmbeddedResource Include="Mapping\Author.hbm.xml" />
-    <EmbeddedResource Include="Mapping\Book.hbm.xml" />
-    <EmbeddedResource Include="Mapping\TotalCount.hbm.xml" />
     <Content Include="Scripts\AuthorsToBooks.js" />
     <Content Include="Scripts\Books.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -350,6 +348,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Entities\Helpers\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

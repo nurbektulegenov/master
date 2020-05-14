@@ -1,11 +1,17 @@
-﻿using BookTestProject.Entities;
-using BookTestProject.Interfaces;
+﻿using BookTestProject.Interfaces;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
+using BookTestProject.Mapping;
+using NHibernate.Cfg.ConfigurationSchema;
+using NHibernate.Engine;
+using NHibernate.Event;
+using NHibernate.Event.Default;
+using NHibernate.Persister.Entity;
 
 namespace BookTestProject
 {
@@ -52,10 +58,11 @@ namespace BookTestProject
         {
             ISessionFactory sessionFactory = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2008.ConnectionString(ConfigurationManager.ConnectionStrings["DBConnection"].ConnectionString).ShowSql())
-                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Books>())
-                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Authors>())
-                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<TotalCounts>())
+                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<BookMap>())
+                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<AuthorMap>())
+                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<TotalCountsMap>())
                 .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(true, true))
+                .ExposeConfiguration(x=>x.SetListener(ListenerType.Delete, new SoftDeleteEventListener()))
                 .BuildSessionFactory();
             return sessionFactory.OpenSession();
         }

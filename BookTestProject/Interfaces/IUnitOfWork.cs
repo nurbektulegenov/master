@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using NHibernate;
 
 namespace BookTestProject.Interfaces

@@ -26,9 +26,15 @@ namespace BookTestProject.Models {
         public long PagesSize { get; set; }
         public int RowsCount { get; set; }
 
-        public virtual IList<BookViewModel> Books { get; set; }
+        public virtual List<BookViewModel> Books { get; set; }
 
         public virtual SelectList Authors { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public BookViewModel()
+        {
+            Authors = null;
+        }
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             using (ISession session = UnitOfWork.OpenSession())
